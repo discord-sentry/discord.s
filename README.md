@@ -1,6 +1,19 @@
-# DiscordSS (Discord ServerSentry)
+# Discord.Sentry
 
-DiscordSS is a powerful Discord bot and web application designed to monitor and report game server statistics in real-time. It provides server administrators with an easy-to-use interface to configure and manage multiple game servers across various Discord guilds.
+> The watchful guardian for your game servers. Always on duty, always reporting.
+
+Discord.Sentry is a powerful Discord bot and web application designed to monitor and report game server statistics in real-time. It provides server administrators with an easy-to-use interface to configure and manage multiple game servers across various Discord guilds.
+
+## Why Discord.Sentry?
+
+- **Real-time Monitoring**: Keep your finger on the pulse of your game servers 24/7
+- **Discord Integration**: Seamless updates right where your community lives
+- **Multi-Server Support**: Monitor all your game servers from a single dashboard
+- **User-Friendly**: Easy setup and intuitive web interface for effortless management
+
+Don't just monitor your servers, guard them with Discord.Sentry.
+
+[Website](https://discordsentry.cc) | [Documentation](https://docs.discordsentry.cc) | [Support](https://discord.gg/discordsentry)
 
 ## Features
 
@@ -23,8 +36,8 @@ DiscordSS is a powerful Discord bot and web application designed to monitor and 
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/DiscordSS.git
-   cd DiscordSS
+   git clone https://github.com/yourusername/Discord.Sentry.git
+   cd Discord.Sentry
    ```
 
 2. Install dependencies:
