@@ -1,10 +1,18 @@
-require('dotenv').config({ path: '.env.local' });
-const gameStatusUpdater = require('../app/utils/ServerMonitor.ts');
-const chalk = require('chalk');
+import dotenv from 'dotenv';
+import chalk from 'chalk';
+import { initializeUpdater } from '../app/utils/ServerMonitor';
+
+dotenv.config({ path: '.env.local' });
 
 console.log(chalk.bold.green('🎮 Game status updater script started 🚀'));
 
-gameStatusUpdater.initializeUpdater().catch((error: unknown) => {
+initializeUpdater().catch((error: unknown) => {
   console.error(chalk.bold.red('❌ Failed to initialize updater:'), error);
+  process.exit(1);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error(chalk.bold.red('Unhandled Rejection at:'), promise, chalk.bold.red('reason:'), reason);
   process.exit(1);
 });

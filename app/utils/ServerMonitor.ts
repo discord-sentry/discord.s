@@ -1,10 +1,12 @@
 // app/utils/game-status-updater.ts
 
-const { GameDig } = require('gamedig');
-const { Pool } = require('pg');
-const nodeFetch = require('node-fetch');
-const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
-const FormDataNode = require('form-data');
+import { GameDig } from 'gamedig';
+import { Pool } from 'pg';
+import nodeFetch from 'node-fetch';
+import FormDataNode from 'form-data';
+import { setTimeout } from 'timers/promises';
+import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
+import { ChartConfiguration, ChartData, ChartOptions } from 'chart.js';
 
 console.log('Attempting to create database pool');
 const pool = new Pool({
@@ -68,7 +70,7 @@ async function initializeDatabase() {
   }
 }
 
-async function sendOrUpdateDiscordMessage(channelId: string, embed: any, messageId?: string, graphBuffer?: Buffer) {
+async function sendOrUpdateDiscordMessage(channelId: string, embed: any, messageId?: string, chartBuffer?: Buffer) {
   console.log(`Attempting to ${messageId ? 'update' : 'send'} message in channel: ${channelId}`);
   try {
     const url = messageId
@@ -79,15 +81,14 @@ async function sendOrUpdateDiscordMessage(channelId: string, embed: any, message
 
     const formData = new FormDataNode();
     formData.append('payload_json', JSON.stringify({ embeds: [embed] }));
-    if (graphBuffer) {
-      formData.append('file', graphBuffer, 'player_graph.png');
+    if (chartBuffer) {
+      formData.append('files[0]', chartBuffer, { filename: 'chart.png' });
     }
 
     const response = await nodeFetch(url, {
       method: method,
       headers: {
         'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-        ...formData.getHeaders()
       },
       body: formData
     });
@@ -104,6 +105,61 @@ async function sendOrUpdateDiscordMessage(channelId: string, embed: any, message
     console.error(`Error ${messageId ? 'updating' : 'sending'} Discord message in channel ${channelId}:`, error);
     return null;
   }
+}
+
+async function generateChartImage(history: any[]) {
+  const width = 400;
+  const height = 200;
+  const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour: 'white' });
+
+  const labels = history.map(h => new Date(h.timestamp).toLocaleTimeString());
+  const data = history.map(h => h.player_count);
+
+  const chartData: ChartData = {
+    labels: labels,
+    datasets: [{
+      label: 'Players',
+      data: data,
+      fill: false,
+      borderColor: 'rgb(75, 192, 192)',
+      tension: 0.1
+    }]
+  };
+
+  const chartOptions: ChartOptions = {
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Player Count'
+        }
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Time'
+        }
+      }
+    },
+    plugins: {
+      title: {
+        display: true,
+        text: 'Player Count Over Time'
+      },
+      legend: {
+        display: false
+      }
+    }
+  };
+
+  const configuration: ChartConfiguration = {
+    type: 'line',
+    data: chartData,
+    options: chartOptions
+  };
+
+  return await chartJSNodeCanvas.renderToBuffer(configuration);
 }
 
 async function updateGameStatus() {
@@ -125,7 +181,7 @@ async function updateGameStatus() {
 
         console.log('GameDig query result:', state);
 
-        // we store the player count in the history for the table
+        // Store the player count in the history
         await client.query(
           'INSERT INTO player_history (server_config_id, player_count) VALUES ($1, $2)',
           [row.id, state.players.length]
@@ -137,27 +193,8 @@ async function updateGameStatus() {
         );
         const history = historyResult.rows.reverse();
 
-        const chartJSNodeCanvas = new ChartJSNodeCanvas({ width: 400, height: 200 });
-        const graphBuffer = await chartJSNodeCanvas.renderToBuffer({
-          type: 'line',
-          data: {
-            labels: history.map((h: { timestamp: string }) => new Date(h.timestamp).toLocaleTimeString()),
-            datasets: [{
-              label: 'Players',
-              data: history.map((h: { player_count: number }) => h.player_count),
-              fill: false,
-              borderColor: 'rgb(75, 192, 192)',
-              tension: 0.1
-            }]
-          },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true
-              }
-            }
-          }
-        });
+        // Generate chart image
+        const chartBuffer = await generateChartImage(history);
 
         const embed = {
           title: `🎮 ${state.name} Server Status`,
@@ -168,12 +205,12 @@ async function updateGameStatus() {
           ],
           color: 0x2F3136, // Dark embed color
           timestamp: new Date().toISOString(),
-          image: { url: 'attachment://player_graph.png' }
+          image: { url: 'attachment://chart.png' }
         };
 
         if (state.players.length > 0) {
           const playerList = state.players
-            .map((p: { name: string }) => p.name)
+            .map((p: any) => p.name || 'Unknown')
             .sort((a: string, b: string) => a.localeCompare(b))
             .join('\n');
           
@@ -210,13 +247,19 @@ async function updateGameStatus() {
           });
         }
 
-        const messageId = await sendOrUpdateDiscordMessage(row.channel_id, embed, row.message_id, graphBuffer);
+        const messageId = await sendOrUpdateDiscordMessage(row.channel_id, embed, row.message_id, chartBuffer);
         if (messageId && messageId !== row.message_id) {
           await client.query('UPDATE server_configs SET message_id = $1 WHERE id = $2', [messageId, row.id]);
           console.log(`Updated message_id for server config ${row.id}`);
         }
+
+        // Add a delay between server queries to avoid rate limiting
+        await setTimeout(1000);
       } catch (error) {
         console.error(`Error querying game server ${row.server_ip}:${row.server_port}:`, error);
+        if (error instanceof Error) {
+          console.error('Error stack:', error.stack);
+        }
         const errorEmbed = {
           title: 'Server Status Error',
           description: `Unable to query the game server at ${row.server_ip}:${row.server_port}`,
@@ -237,7 +280,7 @@ async function updateGameStatus() {
     }
   } finally {
     if (client) {
-      client.release();
+      await client.release();
     }
   }
 }
@@ -258,13 +301,11 @@ async function initializeUpdater() {
     await updateGameStatus();
   } catch (error) {
     console.error('Error initializing updater:', error);
-    process.exit(1); // we exit if the intialzing fails
+    process.exit(1); // we exit if the intializing fails
   }
 }
 
-module.exports = {
-  initializeUpdater,
-};
-
+export { initializeUpdater };
 
 // the bot wont have a online statys 
+

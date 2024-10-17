@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4596:4596"
+    volumes:
+      - .:/app
+    command: npx concurrently "npm:start" "npm:start-updater"
