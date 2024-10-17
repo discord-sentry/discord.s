@@ -2,10 +2,11 @@
   "name": "game.discord",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 4596",
     "lint": "next lint",
     "start-updater": "ts-node scripts/run-updater.ts"
   },

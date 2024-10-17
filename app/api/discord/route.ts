@@ -7,7 +7,17 @@ const DISCORD_API_URL = 'https://discord.com/api/v10';
 let lastRequestTime = 0;
 const RATE_LIMIT_INTERVAL = 5000; // testing anything less than 5 seconds will cause rate limiting 
 
-async function fetchFromDiscord(endpoint: string, method: string = 'GET', body?: any) {
+// Define a type for the request body
+type DiscordRequestBody = {
+  action: string;
+  channelId?: string;
+  content?: string;
+  guildId?: string;
+  name?: string;
+  type?: number;
+};
+
+async function fetchFromDiscord(endpoint: string, method: string = 'GET', body?: Record<string, unknown>) {
   const now = Date.now();
   if (now - lastRequestTime < RATE_LIMIT_INTERVAL) {
     await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_INTERVAL - (now - lastRequestTime)));
@@ -70,7 +80,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  const body: DiscordRequestBody = await request.json();
   const { action } = body;
 
   try {
@@ -85,7 +95,7 @@ export async function POST(request: Request) {
 
       case 'createChannel':
         const { guildId, name, type } = body;
-        if (!guildId || !name || !type) {
+        if (!guildId || !name || type === undefined) {
           return NextResponse.json({ error: 'Guild ID, name, and type are required' }, { status: 400 });
         }
         const channel = await fetchFromDiscord(`/guilds/${guildId}/channels`, 'POST', { name, type });

@@ -1,10 +1,10 @@
 require('dotenv').config({ path: '.env.local' });
 const gameStatusUpdater = require('../app/utils/ServerMonitor.ts');
+const chalk = require('chalk');
 
-console.log('Game status updater script started'); // change this to be more colorful
-// console.log('DB_URL:', process.env.DB_URL); 
+console.log(chalk.bold.green('🎮 Game status updater script started 🚀'));
 
 gameStatusUpdater.initializeUpdater().catch((error: unknown) => {
-  console.error('Failed to initialize updater:', error); // more colorful look
+  console.error(chalk.bold.red('❌ Failed to initialize updater:'), error);
   process.exit(1);
 });

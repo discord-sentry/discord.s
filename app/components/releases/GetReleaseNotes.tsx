@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AlertCircle, Tag, Calendar } from "lucide-react"
 import ReactMarkdown from 'react-markdown'
+import { ReactNode } from 'react'
 
 interface Release {
   id: number
@@ -19,17 +20,22 @@ interface Release {
   body: string
 }
 
-const MarkdownComponents = {
-  h1: (props: any) => <h1 className="text-2xl font-bold mt-6 mb-3" {...props} />,
-  h2: (props: any) => <h2 className="text-xl font-semibold mt-4 mb-2" {...props} />,
-  h3: (props: any) => <h3 className="text-lg font-medium mt-3 mb-1" {...props} />,
-  p: (props: any) => <p className="mb-3 text-gray-700 dark:text-gray-300" {...props} />,
-  ul: (props: any) => <ul className="list-disc list-inside mb-3" {...props} />,
-  ol: (props: any) => <ol className="list-decimal list-inside mb-3" {...props} />,
-  li: (props: any) => <li className="ml-4 mb-1" {...props} />,
-  a: (props: any) => <a className="text-blue-500 hover:underline" {...props} />,
-  code: (props: any) => <code className="bg-gray-100 dark:bg-gray-800 rounded px-1 py-0.5 text-sm" {...props} />,
-  pre: (props: any) => <pre className="bg-gray-100 dark:bg-gray-800 rounded p-3 overflow-x-auto my-3" {...props} />,
+type MarkdownComponentProps = {
+  children: ReactNode
+  [key: string]: any // For any additional props
+}
+
+const MarkdownComponents: Record<string, React.FC<MarkdownComponentProps>> = {
+  h1: ({ children, ...props }) => <h1 className="text-2xl font-bold mt-6 mb-3" {...props}>{children}</h1>,
+  h2: ({ children, ...props }) => <h2 className="text-xl font-semibold mt-4 mb-2" {...props}>{children}</h2>,
+  h3: ({ children, ...props }) => <h3 className="text-lg font-medium mt-3 mb-1" {...props}>{children}</h3>,
+  p: ({ children, ...props }) => <p className="mb-3 text-gray-700 dark:text-gray-300" {...props}>{children}</p>,
+  ul: ({ children, ...props }) => <ul className="list-disc list-inside mb-3" {...props}>{children}</ul>,
+  ol: ({ children, ...props }) => <ol className="list-decimal list-inside mb-3" {...props}>{children}</ol>,
+  li: ({ children, ...props }) => <li className="ml-4 mb-1" {...props}>{children}</li>,
+  a: ({ children, ...props }) => <a className="text-blue-500 hover:underline" {...props}>{children}</a>,
+  code: ({ children, ...props }) => <code className="bg-gray-100 dark:bg-gray-800 rounded px-1 py-0.5 text-sm" {...props}>{children}</code>,
+  pre: ({ children, ...props }) => <pre className="bg-gray-100 dark:bg-gray-800 rounded p-3 overflow-x-auto my-3" {...props}>{children}</pre>,
 }
 
 export function ReleaseNotesModal() {

@@ -11,6 +11,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/
 import { useForm } from "react-hook-form"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Pencil, Trash2, Loader2 } from "lucide-react"
+import Image from 'next/image'
 
 interface GuildInfo {
   id: string
@@ -160,10 +161,12 @@ export default function ColorfulServersView() {
                   <TableCell className="text-white">
                     <div className="flex items-center">
                       {server.guild_info?.icon && (
-                        <img
+                        <Image
                           src={`https://cdn.discordapp.com/icons/${server.guild_info.id}/${server.guild_info.icon}.png`}
                           alt={`${server.guild_info.name} icon`}
-                          className="w-8 h-8 rounded-full mr-2 border-2 border-gray-600"
+                          width={32}
+                          height={32}
+                          className="rounded-full mr-2 border-2 border-gray-600"
                         />
                       )}
                       {server.guild_info?.name || server.guild_id}

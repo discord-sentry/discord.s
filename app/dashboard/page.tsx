@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Server, ChevronDown, AlertCircle } from 'lucide-react'
 import ServerConfigForm from '../components/config/GameServerSetup'
@@ -8,7 +8,7 @@ import { Toolbar } from './DashboardToolbar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-export default function DashboardPage() {
+function DashboardContent() {
   const searchParams = useSearchParams()
   const [selectedGuildId, setSelectedGuildId] = useState<string | null>(null)
 
@@ -53,5 +53,13 @@ export default function DashboardPage() {
       </Card>
       <Toolbar/>
     </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DashboardContent />
+    </Suspense>
   )
 }

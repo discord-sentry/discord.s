@@ -36,6 +36,12 @@ interface ServerConfig {
   messageInterval: number
 }
 
+interface ChannelData {
+  id: string;
+  name: string;
+  type: number;
+}
+
 const gameTypes = [
   { value: 'minecraft', label: 'Minecraft' },
   { value: 'csgo', label: 'Counter-Strike: Global Offensive' },
@@ -54,8 +60,7 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
   const [channels, setChannels] = useState<Array<{ id: string; name: string }>>([])
   const [isLoading, setIsLoading] = useState(false)
   const [alert, setAlert] = useState<{ type: 'success' | 'error', message: string } | null>(null)
-  const { control, handleSubmit, setValue, formState: { errors } } = useForm<ServerConfig>()
-  const [gameTypeSearch, setGameTypeSearch] = useState("")
+  const { control, handleSubmit, formState: { errors } } = useForm<ServerConfig>()
   const [openGameType, setOpenGameType] = React.useState(false)
 
   useEffect(() => {
@@ -63,8 +68,8 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
       try {
         const response = await fetch(`/api/discord?action=getChannels&guildId=${guildId}`)
         if (response.ok) {
-          const channelData = await response.json()
-          setChannels(channelData.filter((channel: any) => channel.type === 0)) 
+          const channelData: ChannelData[] = await response.json()
+          setChannels(channelData.filter((channel) => channel.type === 0))
         }
       } catch (error) {
         console.error('Failed to fetch channels:', error)
