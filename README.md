@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/goodlogo.png" alt="Discord.Sentry Logo" width="" height="200">
+  <img src="public/goodlogo.png" alt="Discord.Sentry Logo" width="200" height="200" style="margin: 20px 0;">
 
   # Discord.Sentry
 
@@ -7,9 +7,15 @@
   [![Discord](https://img.shields.io/discord/YOUR_DISCORD_SERVER_ID?color=7289DA&logo=discord&logoColor=white)](https://discord.gg/discordsentry)
   [![GitHub stars](https://img.shields.io/github/stars/yourusername/Discord.Sentry?style=social)](https://github.com/yourusername/Discord.Sentry/stargazers)
 
-  > The watchful guardian for your game servers. Always on duty, always reporting.
+  <p style="margin: 20px 0;">
+    <strong>The watchful guardian for your game servers. Always on duty, always reporting.</strong>
+  </p>
 
-  [Website](https://discordsentry.cc) | [Documentation](https://docs.discordsentry.cc) | [Support](https://discord.gg/discordsentry)
+  <p style="margin: 20px 0;">
+    <a href="https://discordsentry.cc">Website</a> | 
+    <a href="https://docs.discordsentry.cc">Documentation</a> | 
+    <a href="https://discord.gg/discordsentry">Support</a>
+  </p>
 </div>
 
 ---
