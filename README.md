@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/discordsentry.png" alt="Discord.Sentry Logo" width="" height="200">
+  <img src="public/goodlogo.png" alt="Discord.Sentry Logo" width="" height="200">
 
   # Discord.Sentry
 
