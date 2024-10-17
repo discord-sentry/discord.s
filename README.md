@@ -3,9 +3,9 @@
 
   # Discord.Sentry
 
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  [![Discord](https://img.shields.io/discord/YOUR_DISCORD_SERVER_ID?color=7289DA&logo=discord&logoColor=white)](https://discord.gg/discordsentry)
-  [![GitHub stars](https://img.shields.io/github/stars/yourusername/Discord.Sentry?style=social)](https://github.com/yourusername/Discord.Sentry/stargazers)
+  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+  [![Discord](https://img.shields.io/discord/1133120424054628352?color=7289DA&logo=discord&logoColor=white)](https://discord.gg/discordsentry)
+  [![GitHub stars](https://img.shields.io/github/stars/discord-sentry/discord.s?style=social)](https://github.com/discord-sentry/discord.s/stargazers)
 
   <p style="margin: 20px 0;">
     <strong>The watchful guardian for your game servers. Always on duty, always reporting.</strong>
@@ -122,23 +122,4 @@ This project is licensed under the MIT License.
 
 For more detailed information on the project structure and implementation, please refer to the source code and comments within the files.
 
-## 📈 Project Growth
 
-<div align="center">
-
-```mermaid
-graph TD
-    A[Project Start] --> B[Version 1.0]
-    B --> C[Discord Integration]
-    C --> D[Multi-Server Support]
-    D --> E[Web Dashboard]
-    E --> F[Future Expansions]
-```
-
-</div>
-
----
-
-<div align="center">
-  Made by the Delta Co Dev Team
-</div>
