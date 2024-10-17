@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DiscordSS (Discord ServerSentry)
+
+DiscordSS is a powerful Discord bot and web application designed to monitor and report game server statistics in real-time. It provides server administrators with an easy-to-use interface to configure and manage multiple game servers across various Discord guilds.
+
+## Features
+
+- Real-time game server monitoring
+- Support for multiple game types (Minecraft, CS:GO, Arma 3, and more)
+- Customizable update intervals
+- Discord channel integration for server status updates
+- Web dashboard for easy configuration and management
+- Player count history and graphical representation
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js (v18 or later)
+- PostgreSQL database
+- Discord Bot Token
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/DiscordSS.git
+   cd DiscordSS
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-## Learn More
+3. Set up your environment variables:
+   Create a `.env.local` file in the root directory and add the following:
+   ```
+   DISCORD_BOT_TOKEN=your_discord_bot_token
+   DB_URL=your_postgresql_database_url
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. Initialize the database:
+   Run the SQL commands found in `app/utils/ServerMonitor.ts` to set up your database schema.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Start the development server:
+   ```
+   npm run dev
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+6. In a separate terminal, start the updater script:
+   ```
+   npm run start-updater
+   ```
 
-## Deploy on Vercel
+## Usage
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Access the web dashboard at `http://localhost:3000`
+2. Use the server selector in the toolbar to choose a Discord server
+3. Configure game servers using the provided form
+4. The bot will automatically start monitoring configured servers and posting updates to the specified Discord channels
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Structure
+
+- `/app`: Next.js application files
+  - `/api`: API routes for server-side operations
+  - `/components`: React components
+  - `/dashboard`: Dashboard pages
+  - `/utils`: Utility functions and server monitor
+- `/scripts`: Scripts for running the updater
+- `/public`: Static assets
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License.
+
+## Acknowledgements
+
+- [Next.js](https://nextjs.org/)
+- [Discord API](https://discord.com/developers/docs/intro)
+- [GameDig](https://github.com/gamedig/node-gamedig)
+- [Chart.js](https://www.chartjs.org/)
+
+For more detailed information on the project structure and implementation, please refer to the source code and comments within the files.
