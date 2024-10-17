@@ -11,6 +11,21 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Label } from "@/components/ui/label"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
+import { Check, ChevronsUpDown } from "lucide-react"
+import { cn } from "@/lib/utils"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 interface ServerConfig {
   guildId: string
@@ -25,6 +40,13 @@ const gameTypes = [
   { value: 'minecraft', label: 'Minecraft' },
   { value: 'csgo', label: 'Counter-Strike: Global Offensive' },
   { value: 'arma3', label: 'Arma 3' },
+  { value: 'valheim', label: 'Valheim' },
+  { value: 'rust', label: 'Rust' },
+  { value: 'terraria', label: 'Terraria' },
+  { value: 'factorio', label: 'Factorio' },
+  { value: 'satisfactory', label: 'Satisfactory' },
+  { value: 'ark', label: 'ARK: Survival Evolved' },
+  { value: 'sevendays', label: '7 Days to Die' },
   // Add more game types as needed
 ]
 
@@ -33,6 +55,8 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
   const [isLoading, setIsLoading] = useState(false)
   const [alert, setAlert] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const { control, handleSubmit, setValue, formState: { errors } } = useForm<ServerConfig>()
+  const [gameTypeSearch, setGameTypeSearch] = useState("")
+  const [openGameType, setOpenGameType] = React.useState(false)
 
   useEffect(() => {
     const fetchChannels = async () => {
@@ -135,18 +159,49 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
                 control={control}
                 rules={{ required: 'Game type is required' }}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a game type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {gameTypes.map((game) => (
-                        <SelectItem key={game.value} value={game.value}>
-                          {game.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Popover open={openGameType} onOpenChange={setOpenGameType}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={openGameType}
+                        className="w-full justify-between"
+                      >
+                        {field.value
+                          ? gameTypes.find((game) => game.value === field.value)?.label
+                          : "Select game type..."}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Search game type..." />
+                        <CommandList>
+                          <CommandEmpty>No game type found.</CommandEmpty>
+                          <CommandGroup>
+                            {gameTypes.map((game) => (
+                              <CommandItem
+                                key={game.value}
+                                value={game.value}
+                                onSelect={(currentValue) => {
+                                  field.onChange(currentValue === field.value ? "" : currentValue)
+                                  setOpenGameType(false)
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    field.value === game.value ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {game.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 )}
               />
               {errors.gameType && <p className="text-sm text-red-500">{errors.gameType.message}</p>}
