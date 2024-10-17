@@ -265,3 +265,6 @@ async function initializeUpdater() {
 module.exports = {
   initializeUpdater,
 };
+
+
+// the bot wont have a online statys 

@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 
 const DISCORD_API_URL = 'https://discord.com/api/v10';
 
-// Simple in-memory cache for rate limiting
+// we use simple in-memory cache for rate limiting - for now
 let lastRequestTime = 0;
-const RATE_LIMIT_INTERVAL = 5000; // 5 seconds between requests
+const RATE_LIMIT_INTERVAL = 5000; // testing anything less than 5 seconds will cause rate limiting 
 
 async function fetchFromDiscord(endpoint: string, method: string = 'GET', body?: any) {
   const now = Date.now();
@@ -46,12 +46,19 @@ export async function GET(request: Request) {
         return NextResponse.json(guilds);
 
       case 'getChannels':
+      case 'getGuild':
         const guildId = searchParams.get('guildId');
         if (!guildId) {
           return NextResponse.json({ error: 'Guild ID is required' }, { status: 400 });
         }
-        const channels = await fetchFromDiscord(`/guilds/${guildId}/channels`);
-        return NextResponse.json(channels);
+        
+        if (action === 'getChannels') {
+          const channels = await fetchFromDiscord(`/guilds/${guildId}/channels`);
+          return NextResponse.json(channels);
+        } else {
+          const guild = await fetchFromDiscord(`/guilds/${guildId}`);
+          return NextResponse.json(guild);
+        }
 
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

@@ -9,12 +9,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
-import { toast } from "@/hooks/use-toast"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Pencil, Trash2, Loader2 } from "lucide-react"
+
+interface GuildInfo {
+  id: string
+  name: string
+  icon: string
+}
 
 interface ServerConfig {
   id: number
   guild_id: string
+  guild_info: GuildInfo
   channel_id: string
   game_type: string
   server_ip: string
@@ -22,11 +29,19 @@ interface ServerConfig {
   message_interval: number
 }
 
-export default function ServersView() {
+const gameTypeColors: { [key: string]: string } = {
+  'minecraft': 'bg-emerald-600 text-white',
+  'valorant': 'bg-rose-600 text-white',
+  'csgo': 'bg-amber-600 text-white',
+  'default': 'bg-sky-600 text-white'
+}
+
+export default function ColorfulServersView() {
   const [servers, setServers] = useState<ServerConfig[]>([])
   const [loading, setLoading] = useState(true)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [editingServer, setEditingServer] = useState<ServerConfig | null>(null)
+  const [alert, setAlert] = useState<{ type: 'success' | 'error', message: string } | null>(null)
 
   const form = useForm<ServerConfig>()
 
@@ -39,17 +54,21 @@ export default function ServersView() {
       const response = await fetch('/api/server-config')
       if (response.ok) {
         const data = await response.json()
-        setServers(data)
+        const serversWithGuildInfo = await Promise.all(data.map(async (server: ServerConfig) => {
+          const guildResponse = await fetch(`/api/discord?action=getGuild&guildId=${server.guild_id}`)
+          if (guildResponse.ok) {
+            const guildInfo = await guildResponse.json()
+            return { ...server, guild_info: guildInfo }
+          }
+          return server
+        }))
+        setServers(serversWithGuildInfo)
       } else {
         throw new Error('Failed to fetch servers')
       }
     } catch (error) {
       console.error('Error fetching servers:', error)
-      toast({
-        title: "Error",
-        description: "Failed to load servers",
-        variant: "destructive",
-      })
+      setAlert({ type: 'error', message: "Failed to load servers" })
     } finally {
       setLoading(false)
     }
@@ -65,21 +84,16 @@ export default function ServersView() {
     try {
       const response = await fetch(`/api/server-config/${id}`, { method: 'DELETE' })
       if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Server deleted successfully",
-        })
+        setAlert({ type: 'success', message: "Server deleted successfully" })
+        clearAlert()
         fetchServers()
       } else {
         throw new Error('Failed to delete server')
       }
     } catch (error) {
       console.error('Error deleting server:', error)
-      toast({
-        title: "Error",
-        description: "Failed to delete server",
-        variant: "destructive",
-      })
+      setAlert({ type: 'error', message: "Failed to delete server" })
+      clearAlert()
     }
   }
 
@@ -94,10 +108,8 @@ export default function ServersView() {
       })
 
       if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Server updated successfully",
-        })
+        setAlert({ type: 'success', message: "Server updated successfully" })
+        clearAlert()
         setEditModalOpen(false)
         fetchServers()
       } else {
@@ -105,22 +117,28 @@ export default function ServersView() {
       }
     } catch (error) {
       console.error('Error updating server:', error)
-      toast({
-        title: "Error",
-        description: "Failed to update server",
-        variant: "destructive",
-      })
+      setAlert({ type: 'error', message: "Failed to update server" })
+      clearAlert()
     }
   }
 
+  const clearAlert = () => {
+    setTimeout(() => setAlert(null), 5000)
+  }
+
   return (
-    <div className="container text-white mx-auto py-10">
-      <h2 className="text-2xl font-bold mb-5">Server Configurations</h2>
-      <div className="rounded-md border">
+    <div className="container mx-auto py-10" style={{ backgroundColor: '#212121' }}>
+      {alert && (
+        <Alert variant={alert.type === 'error' ? "destructive" : "default"} className="mb-4">
+          <AlertDescription>{alert.message}</AlertDescription>
+        </Alert>
+      )}
+      <h2 className="text-2xl font-bold mb-5 text-white">Server Configurations</h2>
+      <div className="rounded-md border border-gray-700 overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="text-white">Guild ID</TableHead>
+            <TableRow className="bg-gray-800">
+              <TableHead className="text-white">Guild</TableHead>
               <TableHead className="text-white">Channel ID</TableHead>
               <TableHead className="text-white">Game Type</TableHead>
               <TableHead className="text-white">Server IP</TableHead>
@@ -133,23 +151,38 @@ export default function ServersView() {
             {loading ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-white" />
                 </TableCell>
               </TableRow>
             ) : (
-              servers.map((server) => (
-                <TableRow key={server.id}>
-                  <TableCell>{server.guild_id}</TableCell>
-                  <TableCell>{server.channel_id}</TableCell>
-                  <TableCell>{server.game_type}</TableCell>
-                  <TableCell>{server.server_ip}</TableCell>
-                  <TableCell>{server.server_port}</TableCell>
-                  <TableCell>{server.message_interval}</TableCell>
+              servers.map((server, index) => (
+                <TableRow key={server.id} className={index % 2 === 0 ? 'bg-gray-700' : 'bg-gray-800'}>
+                  <TableCell className="text-white">
+                    <div className="flex items-center">
+                      {server.guild_info?.icon && (
+                        <img
+                          src={`https://cdn.discordapp.com/icons/${server.guild_info.id}/${server.guild_info.icon}.png`}
+                          alt={`${server.guild_info.name} icon`}
+                          className="w-8 h-8 rounded-full mr-2 border-2 border-gray-600"
+                        />
+                      )}
+                      {server.guild_info?.name || server.guild_id}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-gray-300">{server.channel_id}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(server)}>
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${gameTypeColors[server.game_type.toLowerCase()] || gameTypeColors['default']}`}>
+                      {server.game_type}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-gray-300">{server.server_ip}</TableCell>
+                  <TableCell className="text-gray-300">{server.server_port}</TableCell>
+                  <TableCell className="text-gray-300">{server.message_interval}</TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(server)} className="text-blue-400 hover:text-blue-300">
                       <Pencil className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(server.id)}>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(server.id)} className="text-red-400 hover:text-red-300">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </TableCell>
@@ -161,7 +194,7 @@ export default function ServersView() {
       </div>
 
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent>
+        <DialogContent className="bg-gray-800 text-white">
           <DialogHeader>
             <DialogTitle>Edit Server Configuration</DialogTitle>
           </DialogHeader>
@@ -174,7 +207,7 @@ export default function ServersView() {
                   <FormItem>
                     <FormLabel>Channel ID</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} className="bg-gray-700 text-white border-gray-600" />
                     </FormControl>
                   </FormItem>
                 )}
@@ -186,7 +219,7 @@ export default function ServersView() {
                   <FormItem>
                     <FormLabel>Game Type</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} className="bg-gray-700 text-white border-gray-600" />
                     </FormControl>
                   </FormItem>
                 )}
@@ -198,7 +231,7 @@ export default function ServersView() {
                   <FormItem>
                     <FormLabel>Server IP</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} className="bg-gray-700 text-white border-gray-600" />
                     </FormControl>
                   </FormItem>
                 )}
@@ -210,7 +243,7 @@ export default function ServersView() {
                   <FormItem>
                     <FormLabel>Server Port</FormLabel>
                     <FormControl>
-                      <Input {...field} type="number" />
+                      <Input {...field} type="number" className="bg-gray-700 text-white border-gray-600" />
                     </FormControl>
                   </FormItem>
                 )}
@@ -222,13 +255,13 @@ export default function ServersView() {
                   <FormItem>
                     <FormLabel>Message Interval</FormLabel>
                     <FormControl>
-                      <Input {...field} type="number" />
+                      <Input {...field} type="number" className="bg-gray-700 text-white border-gray-600" />
                     </FormControl>
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="submit">Update</Button>
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">Update</Button>
               </DialogFooter>
             </form>
           </Form>

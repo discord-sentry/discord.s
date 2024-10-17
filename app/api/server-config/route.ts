@@ -27,14 +27,12 @@ export async function POST(request: Request) {
   try {
     const client = await pool.connect();
     try {
-      // Check if a configuration with the same server IP and port already exists for this guild
       const existingConfig = await client.query(
         'SELECT id FROM server_configs WHERE guild_id = $1 AND server_ip = $2 AND server_port = $3',
         [guildId, serverIp, serverPort]
       );
 
       if (existingConfig.rows.length > 0) {
-        // Update existing configuration
         await client.query(
           `UPDATE server_configs 
           SET channel_id = $1, game_type = $2, message_interval = $3
@@ -42,7 +40,7 @@ export async function POST(request: Request) {
           [channelId, gameType, messageInterval || 60, existingConfig.rows[0].id]
         );
       } else {
-        // Insert new configuration
+        // we insert the new configuration
         await client.query(
           `INSERT INTO server_configs 
           (guild_id, channel_id, game_type, server_ip, server_port, message_interval) 

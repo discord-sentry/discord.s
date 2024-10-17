@@ -2,8 +2,6 @@
 
 'use client';
 
-'use client'
-
 import React, { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { Button } from "@/components/ui/button"
@@ -11,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { toast } from "@/hooks/use-toast"
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
 
 interface ServerConfig {
@@ -33,6 +31,7 @@ const gameTypes = [
 export default function ServerConfigForm({ guildId }: { guildId: string }) {
   const [channels, setChannels] = useState<Array<{ id: string; name: string }>>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [alert, setAlert] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const { control, handleSubmit, setValue, formState: { errors } } = useForm<ServerConfig>()
 
   useEffect(() => {
@@ -41,14 +40,13 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
         const response = await fetch(`/api/discord?action=getChannels&guildId=${guildId}`)
         if (response.ok) {
           const channelData = await response.json()
-          setChannels(channelData.filter((channel: any) => channel.type === 0)) // Only text channels
+          setChannels(channelData.filter((channel: any) => channel.type === 0)) 
         }
       } catch (error) {
         console.error('Failed to fetch channels:', error)
-        toast({
-          title: "Error",
-          description: "Failed to fetch channels. Please try again.",
-          variant: "destructive",
+        setAlert({
+          type: 'error',
+          message: "Failed to fetch channels. Please try again."
         })
       }
     }
@@ -71,19 +69,18 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
       })
 
       if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Your server configuration has been saved successfully.",
+        setAlert({
+          type: 'success',
+          message: "Your server configuration has been saved successfully."
         })
       } else {
         throw new Error('Failed to save configuration')
       }
     } catch (error) {
       console.error('Error saving configuration:', error)
-      toast({
-        title: "Error",
-        description: "Failed to save server configuration. Please try again.",
-        variant: "destructive",
+      setAlert({
+        type: 'error',
+        message: "Failed to save server configuration. Please try again."
       })
     } finally {
       setIsLoading(false)
@@ -97,6 +94,12 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
         <CardDescription>Configure your game server settings</CardDescription>
       </CardHeader>
       <CardContent>
+        {alert && (
+          <Alert variant={alert.type === 'error' ? "destructive" : "default"} className="mb-6">
+            <AlertTitle>{alert.type === 'error' ? "Error" : "Success"}</AlertTitle>
+            <AlertDescription>{alert.message}</AlertDescription>
+          </Alert>
+        )}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <input type="hidden" name="guildId" value={guildId} />
           
