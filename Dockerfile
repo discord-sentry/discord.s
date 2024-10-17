@@ -20,7 +20,8 @@ WORKDIR /app
 
 # Install runtime dependencies
 COPY package*.json ./
-RUN npm ci --only=production --silent
+RUN npm ci --only=production
+
 
 # Install TypeScript and ts-node for the updater script
 RUN npm install typescript ts-node concurrently --silent
