@@ -3,6 +3,9 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
+# Install Python and build dependencies required for node-gyp
+RUN apk add --no-cache python3 make g++ pkgconfig pixman-dev cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+
 # Install dependencies
 COPY package*.json ./
 RUN npm ci --silent
@@ -18,12 +21,14 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install runtime dependencies
+# Install runtime dependencies along with Python and other build tools
+RUN apk add --no-cache python3 make g++ pkgconfig pixman-dev cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+
+# Install production dependencies
 COPY package*.json ./
 RUN npm ci --only=production
 
-
-# Install TypeScript and ts-node for the updater script
+# Install TypeScript, ts-node, and concurrently for the updater script
 RUN npm install typescript ts-node concurrently --silent
 
 # Copy built assets from the builder stage
