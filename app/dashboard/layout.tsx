@@ -1,8 +1,7 @@
 // app/dashboard/layout.tsx
 import React from 'react';
-import { Toolbar } from './DashTool';
+import { Toolbar } from './DashboardToolbar';
 
-// DashboardLayout component
 export default function DashboardLayout({
   children,
 }: {

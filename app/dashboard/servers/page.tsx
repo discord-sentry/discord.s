@@ -1,12 +1,12 @@
 // app/dashboard/servers/page.tsx
 
 import React from 'react';
-import ServersView from '../../components/servers-view';
+import ServersConfig from '../../components/ServerConfigurationManager';
 
 export default function ServersPage() {
     return (
         <div>
-            <ServersView />
+            <ServersConfig />
         </div>
     );
 }

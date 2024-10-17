@@ -4,8 +4,8 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import ServerConfigForm from '../components/config/server-config';
-import { Toolbar } from './DashTool';
+import ServerConfigForm from '../components/config/GameServerSetup';
+import { Toolbar } from './DashboardToolbar';
 
 export default function DashboardPage() {
   const searchParams = useSearchParams();
