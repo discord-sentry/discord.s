@@ -6,7 +6,8 @@ export async function GET() {
   try {
     const owner = 'discord-sentry';
     const repo = 'discord.s';
-    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases?per_page=5`;
+    const tag = 'v0.9.0';
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases/tags/${tag}`;
 
     const response = await fetch(apiUrl, {
       headers: {
@@ -16,22 +17,28 @@ export async function GET() {
     });
 
     if (!response.ok) {
+      const errorBody = await response.text();
+      console.error(`GitHub API responded with status ${response.status}. Body: ${errorBody}`);
       throw new Error(`GitHub API responded with status ${response.status}`);
     }
 
-    const releases = await response.json();
+    const release = await response.json();
 
-    const formattedReleases = releases.map((release: any) => ({
+    const formattedRelease = {
       id: release.id,
       name: release.name,
       tag_name: release.tag_name,
       published_at: release.published_at,
       body: release.body
-    }));
+    };
 
-    return NextResponse.json(formattedReleases);
+    return NextResponse.json(formattedRelease);
   } catch (error) {
     console.error('Error fetching release notes:', error);
-    return NextResponse.json({ error: 'Failed to fetch release notes' }, { status: 500 });
+    if (error instanceof Error) {
+      return NextResponse.json({ error: 'Failed to fetch release notes', details: error.message }, { status: 500 });
+    } else {
+      return NextResponse.json({ error: 'Failed to fetch release notes', details: 'An unknown error occurred' }, { status: 500 });
+    }
   }
 }

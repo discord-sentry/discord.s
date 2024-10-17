@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="public/goodlogo.png" alt="Discord.Sentry Logo" width="1000" height="300" style="margin: 20px 0;">
+  <img src="public/goodlogo.png" alt="discord.sentry Logo" width="1000" height="300" style="margin: 20px 0;">
 
-  # Discord.Sentry
+  # discord.sentry
 
   [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
   [![Discord](https://img.shields.io/discord/1133120424054628352?color=7289DA&logo=discord&logoColor=white)](https://discord.gg/discordsentry)
@@ -20,7 +20,7 @@
 
 ---
 
-Discord.Sentry is a powerful Discord bot and web application designed to monitor and report game server statistics in real-time. It provides server administrators with an easy-to-use interface to configure and manage multiple game servers across various Discord guilds.
+discord.sentry is a powerful Discord bot and web application designed to monitor and report game server statistics in real-time. It provides server administrators with an easy-to-use interface to configure and manage multiple game servers across various Discord guilds.
 
 ## 🚀 Features
 
@@ -38,55 +38,23 @@ Discord.Sentry is a powerful Discord bot and web application designed to monitor
 </div>
 
 
-## 🤔 Why Discord.Sentry?
+## 🤔 Why discord.sentry?
 
 - **Real-time Monitoring**: Keep your finger on the pulse of your game servers 24/7
 - **Discord Integration**: Seamless updates right where your community lives
 - **Multi-Server Support**: Monitor all your game servers from a single dashboard
 - **User-Friendly**: Easy setup and intuitive web interface for effortless management
 
-Don't just monitor your servers, guard them with Discord.Sentry.
+Don't just monitor your servers, guard them with discord.sentry.
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js (v18 or later)
-- PostgreSQL database
+- PostgreSQL database (supabase, vercel postgres, coolify, etc.)
 - Discord Bot Token
 
-### Installation
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/Discord.Sentry.git
-   cd Discord.Sentry
-   ```
-
-2. Install dependencies:
-   ```
-   npm install
-   ```
-
-3. Set up your environment variables:
-   Create a `.env.local` file in the root directory and add the following:
-   ```
-   DISCORD_BOT_TOKEN=your_discord_bot_token
-   DB_URL=your_postgresql_database_url
-   ```
-
-4. Initialize the database:
-   Run the SQL commands found in `app/utils/ServerMonitor.ts` to set up your database schema.
-
-5. Start the development server:
-   ```
-   npm run dev
-   ```
-
-6. In a separate terminal, start the updater script:
-   ```
-   npm run start-updater
-   ```
 
 ## 🖥️ Usage
 
