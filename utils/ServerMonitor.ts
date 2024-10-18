@@ -145,33 +145,24 @@ async function generateChartImage(history: any[]) {
   ctx.lineTo(chartArea.right, chartArea.bottom);
   ctx.stroke();
 
-  // Draw data points and lines
-  ctx.strokeStyle = '#7289da';  // Discord blurple color
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  data.forEach((count, i) => {
-    const x = chartArea.left + (i / (data.length - 1)) * (chartArea.right - chartArea.left);
-    const y = chartArea.bottom - ((count - minCount) / (maxCount - minCount)) * (chartArea.bottom - chartArea.top);
-    if (i === 0) {
-      ctx.moveTo(x, y);
-    } else {
-      ctx.lineTo(x, y);
-    }
-  });
-  ctx.stroke();
-
-  // Draw data points
+  // Draw ASCII-style chart
   ctx.fillStyle = '#ffffff';
-  data.forEach((count, i) => {
-    const x = chartArea.left + (i / (data.length - 1)) * (chartArea.right - chartArea.left);
-    const y = chartArea.bottom - ((count - minCount) / (maxCount - minCount)) * (chartArea.bottom - chartArea.top);
-    ctx.beginPath();
-    ctx.arc(x, y, 6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#7289da';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  });
+  ctx.font = 'bold 14px monospace';
+  const chartWidth = 24;
+  const chartHeight = 10;
+  const cellWidth = (chartArea.right - chartArea.left) / chartWidth;
+  const cellHeight = (chartArea.bottom - chartArea.top) / chartHeight;
+
+  for (let i = 0; i < chartWidth; i++) {
+    const index = Math.floor((i / chartWidth) * (data.length - 1));
+    const value = data[index];
+    const normalizedValue = Math.floor(((value - minCount) / (maxCount - minCount)) * chartHeight);
+    
+    for (let j = 0; j < chartHeight; j++) {
+      const char = j >= chartHeight - normalizedValue ? '█' : '·';
+      ctx.fillText(char, chartArea.left + i * cellWidth, chartArea.bottom - j * cellHeight);
+    }
+  }
 
   // Draw Y-axis labels
   ctx.fillStyle = '#ffffff';
@@ -234,8 +225,10 @@ async function updateGameStatus() {
         // Generate chart image
         const chartBuffer = await generateChartImage(history);
 
+        const chartData = history.map(h => h.player_count).join(',');
         const embed = {
           title: `🎮 ${state.name} Server Status`,
+          description: `Player count trend: \`${chartData}\``,
           fields: [
             { name: '👥 Players', value: `\`${state.players.length}/${state.maxplayers}\``, inline: true },
             { name: '🗺️ Map', value: `\`${state.map}\``, inline: true },
@@ -347,5 +340,6 @@ async function initializeUpdater() {
 export { initializeUpdater };
 
 // the bot wont have a online statys 
+
 
 
