@@ -8,6 +8,8 @@ import { setTimeout } from 'timers/promises';
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
 import { ChartConfiguration, ChartData, ChartOptions } from 'chart.js';
 import dotenv from 'dotenv';
+import { Chart, registerables } from 'chart.js';
+Chart.register(...registerables);
 dotenv.config({ path: '.env' });
 
 console.log('Attempting to create database pool');
@@ -112,11 +114,11 @@ async function sendOrUpdateDiscordMessage(channelId: string, embed: any, message
 }
 
 async function generateChartImage(history: any[]) {
-  const width = 400;
-  const height = 200;
+  const width = 600; // Increased width for better readability
+  const height = 300; // Increased height
   const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour: 'white' });
 
-  const labels = history.map(h => new Date(h.timestamp).toLocaleTimeString());
+  const labels = history.map(h => new Date(h.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
   const data = history.map(h => h.player_count);
 
   const chartData: ChartData = {
@@ -126,41 +128,78 @@ async function generateChartImage(history: any[]) {
       data: data,
       fill: false,
       borderColor: 'rgb(75, 192, 192)',
-      tension: 0.1
+      tension: 0.1,
+      pointRadius: 3,
+      pointHoverRadius: 5,
     }]
   };
 
   const chartOptions: ChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
     scales: {
       y: {
         beginAtZero: true,
         title: {
           display: true,
-          text: 'Player Count'
-        }
+          text: 'Player Count',
+          font: {
+            size: 14,
+            weight: 'bold',
+          },
+          color: '#333',
+        },
+        ticks: {
+          font: {
+            size: 12,
+          },
+          color: '#666',
+        },
       },
       x: {
         title: {
           display: true,
-          text: 'Time'
-        }
-      }
+          text: 'Time',
+          font: {
+            size: 14,
+            weight: 'bold',
+          },
+          color: '#333',
+        },
+        ticks: {
+          font: {
+            size: 10,
+          },
+          color: '#666',
+          maxRotation: 45,
+          minRotation: 45,
+        },
+      },
     },
     plugins: {
       title: {
         display: true,
-        text: 'Player Count Over Time'
+        text: 'Player Count Over Time',
+        font: {
+          size: 18,
+          weight: 'bold',
+        },
+        color: '#333',
+        padding: {
+          top: 10,
+          bottom: 30,
+        },
       },
       legend: {
-        display: false
-      }
-    }
+        display: false,
+      },
+    },
   };
 
   const configuration: ChartConfiguration = {
     type: 'line',
     data: chartData,
-    options: chartOptions
+    options: chartOptions,
   };
 
   return await chartJSNodeCanvas.renderToBuffer(configuration);
