@@ -10,7 +10,7 @@ RUN apk add --no-cache python3 make g++ pkgconfig pixman-dev cairo-dev pango-dev
 COPY package*.json ./
 RUN npm ci --silent
 
-# Copy the rest of the app's source code
+# Copy the rest of the app's source code, including .env.local
 COPY . .
 
 # Build the Next.js app and TypeScript files
@@ -34,12 +34,14 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/scripts ./scripts
 
+# Copy the .env.local file
+COPY .env.local .env.local
+
 # Expose the port the app runs on
 EXPOSE 4596
 
 # Start both the Next.js app and the precompiled updater script using concurrently
 CMD ["npx", "concurrently", "npm:start", "node", "scripts/run-updater.js"]
-
 
 # docker build -t game.discord .
 # docker run -d -p 4596:4596 game.discord
