@@ -31,6 +31,7 @@ export default function ProtectPage() {
         setError('Incorrect password')
       }
     } catch (err) {
+      console.error('Error during authentication:', err)
       setError('An error occurred. Please try again.')
     } finally {
       setIsLoading(false)
