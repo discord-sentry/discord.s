@@ -31,10 +31,10 @@ interface ServerConfig {
 }
 
 const gameTypeColors: { [key: string]: string } = {
-  'minecraft': 'bg-emerald-600 text-white',
-  'valorant': 'bg-rose-600 text-white',
-  'csgo': 'bg-amber-600 text-white',
-  'default': 'bg-sky-600 text-white'
+  'minecraft': 'bg-[#2dd4bf] text-[#212121]',
+  'valorant': 'bg-[#2dd4bf] text-[#212121]',
+  'csgo': 'bg-[#2dd4bf] text-[#212121]',
+  'default': 'bg-[#2dd4bf] text-[#212121]'
 }
 
 export default function ColorfulServersView() {
@@ -134,36 +134,36 @@ export default function ColorfulServersView() {
   }
 
   return (
-    <div className="container mx-auto py-10" style={{ backgroundColor: '#212121' }}>
+    <div className="container mx-auto py-10 bg-[#212121] text-white">
       {alert && (
         <Alert variant={alert.type === 'error' ? "destructive" : "default"} className="mb-4">
           <AlertDescription>{alert.message}</AlertDescription>
         </Alert>
       )}
-      <h2 className="text-2xl font-bold mb-5 text-white">Server Configurations</h2>
-      <div className="rounded-md border border-gray-700 overflow-hidden">
+      <h2 className="text-2xl font-bold mb-5 text-[#2dd4bf]">Server Configurations</h2>
+      <div className="rounded-md border border-[#2dd4bf] overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-800">
-              <TableHead className="text-white">Guild</TableHead>
-              <TableHead className="text-white">Channel ID</TableHead>
-              <TableHead className="text-white">Game Type</TableHead>
-              <TableHead className="text-white">Server IP</TableHead>
-              <TableHead className="text-white">Server Port</TableHead>
-              <TableHead className="text-white">Message Interval</TableHead>
-              <TableHead className="text-white">Actions</TableHead>
+            <TableRow className="bg-[#2a2a2a]">
+              <TableHead className="text-[#2dd4bf]">Guild</TableHead>
+              <TableHead className="text-[#2dd4bf]">Channel ID</TableHead>
+              <TableHead className="text-[#2dd4bf]">Game Type</TableHead>
+              <TableHead className="text-[#2dd4bf]">Server IP</TableHead>
+              <TableHead className="text-[#2dd4bf]">Server Port</TableHead>
+              <TableHead className="text-[#2dd4bf]">Message Interval</TableHead>
+              <TableHead className="text-[#2dd4bf]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-white" />
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-[#2dd4bf]" />
                 </TableCell>
               </TableRow>
             ) : (
               servers.map((server, index) => (
-                <TableRow key={server.id} className={index % 2 === 0 ? 'bg-gray-700' : 'bg-gray-800'}>
+                <TableRow key={server.id} className={index % 2 === 0 ? 'bg-[#2a2a2a]' : 'bg-[#333333]'}>
                   <TableCell className="text-white">
                     <div className="flex items-center">
                       {server.guild_info?.icon && (
@@ -172,7 +172,7 @@ export default function ColorfulServersView() {
                           alt={`${server.guild_info.name} icon`}
                           width={32}
                           height={32}
-                          className="rounded-full mr-2 border-2 border-gray-600"
+                          className="rounded-full mr-2 border-2 border-[#2dd4bf]"
                         />
                       )}
                       {server.guild_info?.name || server.guild_id}
@@ -188,7 +188,7 @@ export default function ColorfulServersView() {
                   <TableCell className="text-gray-300">{server.server_port}</TableCell>
                   <TableCell className="text-gray-300">{server.message_interval}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(server)} className="text-blue-400 hover:text-blue-300">
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(server)} className="text-[#2dd4bf] hover:text-[#20a08d]">
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => handleDelete(server.id)} className="text-red-400 hover:text-red-300">
@@ -203,9 +203,9 @@ export default function ColorfulServersView() {
       </div>
 
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent className="bg-gray-800 text-white">
+        <DialogContent className="bg-[#2a2a2a] text-white">
           <DialogHeader>
-            <DialogTitle>Edit Server Configuration</DialogTitle>
+            <DialogTitle className="text-[#2dd4bf]">Edit Server Configuration</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleEditSubmit)} className="space-y-4">
@@ -214,9 +214,9 @@ export default function ColorfulServersView() {
                 name="channel_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Channel ID</FormLabel>
+                    <FormLabel className="text-[#2dd4bf]">Channel ID</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-gray-700 text-white border-gray-600" />
+                      <Input {...field} className="bg-[#333333] text-white border-[#2dd4bf]" />
                     </FormControl>
                   </FormItem>
                 )}
@@ -226,9 +226,9 @@ export default function ColorfulServersView() {
                 name="game_type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Game Type</FormLabel>
+                    <FormLabel className="text-[#2dd4bf]">Game Type</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-gray-700 text-white border-gray-600" />
+                      <Input {...field} className="bg-[#333333] text-white border-[#2dd4bf]" />
                     </FormControl>
                   </FormItem>
                 )}
@@ -238,9 +238,9 @@ export default function ColorfulServersView() {
                 name="server_ip"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Server IP</FormLabel>
+                    <FormLabel className="text-[#2dd4bf]">Server IP</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-gray-700 text-white border-gray-600" />
+                      <Input {...field} className="bg-[#333333] text-white border-[#2dd4bf]" />
                     </FormControl>
                   </FormItem>
                 )}
@@ -250,9 +250,9 @@ export default function ColorfulServersView() {
                 name="server_port"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Server Port</FormLabel>
+                    <FormLabel className="text-[#2dd4bf]">Server Port</FormLabel>
                     <FormControl>
-                      <Input {...field} type="number" className="bg-gray-700 text-white border-gray-600" />
+                      <Input {...field} type="number" className="bg-[#333333] text-white border-[#2dd4bf]" />
                     </FormControl>
                   </FormItem>
                 )}
@@ -262,15 +262,15 @@ export default function ColorfulServersView() {
                 name="message_interval"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Message Interval</FormLabel>
+                    <FormLabel className="text-[#2dd4bf]">Message Interval</FormLabel>
                     <FormControl>
-                      <Input {...field} type="number" className="bg-gray-700 text-white border-gray-600" />
+                      <Input {...field} type="number" className="bg-[#333333] text-white border-[#2dd4bf]" />
                     </FormControl>
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">Update</Button>
+                <Button type="submit" className="bg-[#2dd4bf] hover:bg-[#20a08d] text-[#212121]">Update</Button>
               </DialogFooter>
             </form>
           </Form>

@@ -34,7 +34,9 @@ discord.sentry is a powerful Discord bot and web application designed to monitor
 ## 🖼️ Preview
 
 <div align="center">
-  <img src="path/to/dashboard-preview.png" alt="Dashboard Preview" width="80%">
+  <img src="public/showcase/dashboard-config.png" alt="Dashboard Preview" width="80%">
+  <img src="public/showcase/server-config.png" alt="Server Config Preview" width="80%">
+  <img src="public/showcase/DiscordEmbed.png" alt="Discord Embed Preview" width="80%">
 </div>
 
 

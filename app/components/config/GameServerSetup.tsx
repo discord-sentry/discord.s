@@ -10,8 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
-import { Loader2 } from "lucide-react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Loader2, Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   Command,
@@ -53,7 +52,6 @@ const gameTypes = [
   { value: 'satisfactory', label: 'Satisfactory' },
   { value: 'ark', label: 'ARK: Survival Evolved' },
   { value: 'sevendays', label: '7 Days to Die' },
-  // Add more game types as needed
 ]
 
 export default function ServerConfigForm({ guildId }: { guildId: string }) {
@@ -117,15 +115,15 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto bg-card text-card-foreground">
+    <Card className="w-full max-w-4xl mx-auto bg-[#2a2a2a] text-white border-[#2dd4bf]">
       <CardHeader>
-        <CardTitle>Server Configuration</CardTitle>
-        <CardDescription>Configure your game server settings</CardDescription>
+        <CardTitle className="text-[#2dd4bf]">Server Configuration</CardTitle>
+        <CardDescription className="text-gray-400">Configure your game server settings</CardDescription>
       </CardHeader>
       <CardContent>
         {alert && (
-          <Alert variant={alert.type === 'error' ? "destructive" : "default"} className="mb-6">
-            <AlertTitle>{alert.type === 'error' ? "Error" : "Success"}</AlertTitle>
+          <Alert variant={alert.type === 'error' ? "destructive" : "default"} className="mb-6 bg-[#333333] border-[#2dd4bf]">
+            <AlertTitle className="text-[#2dd4bf]">{alert.type === 'error' ? "Error" : "Success"}</AlertTitle>
             <AlertDescription>{alert.message}</AlertDescription>
           </Alert>
         )}
@@ -134,19 +132,19 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="channelId">Channel</Label>
+              <Label htmlFor="channelId" className="text-[#2dd4bf]">Channel</Label>
               <Controller
                 name="channelId"
                 control={control}
                 rules={{ required: 'Channel is required' }}
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-[#333333] border-[#2dd4bf] text-white">
                       <SelectValue placeholder="Select a channel" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-[#333333] border-[#2dd4bf]">
                       {channels.map((channel) => (
-                        <SelectItem key={channel.id} value={channel.id}>
+                        <SelectItem key={channel.id} value={channel.id} className="text-white hover:bg-[#2dd4bf] hover:text-[#212121]">
                           {channel.name}
                         </SelectItem>
                       ))}
@@ -158,7 +156,7 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="gameType">Game Type</Label>
+              <Label htmlFor="gameType" className="text-[#2dd4bf]">Game Type</Label>
               <Controller
                 name="gameType"
                 control={control}
@@ -170,7 +168,7 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
                         variant="outline"
                         role="combobox"
                         aria-expanded={openGameType}
-                        className="w-full justify-between"
+                        className="w-full justify-between bg-[#333333] border-[#2dd4bf] text-white hover:bg-[#2dd4bf] hover:text-[#212121]"
                       >
                         {field.value
                           ? gameTypes.find((game) => game.value === field.value)?.label
@@ -178,11 +176,11 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-full p-0">
+                    <PopoverContent className="w-full p-0 bg-[#333333] border-[#2dd4bf]">
                       <Command>
-                        <CommandInput placeholder="Search game type..." />
+                        <CommandInput placeholder="Search game type..." className="text-black" />
                         <CommandList>
-                          <CommandEmpty>No game type found.</CommandEmpty>
+                          <CommandEmpty className="text-black">No game type found.</CommandEmpty>
                           <CommandGroup>
                             {gameTypes.map((game) => (
                               <CommandItem
@@ -192,6 +190,7 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
                                   field.onChange(currentValue === field.value ? "" : currentValue)
                                   setOpenGameType(false)
                                 }}
+                                className="text-black hover:bg-[#2dd4bf] hover:text-[#212121]"
                               >
                                 <Check
                                   className={cn(
@@ -213,39 +212,39 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="serverIp">Server IP</Label>
+              <Label htmlFor="serverIp" className="text-[#2dd4bf]">Server IP</Label>
               <Controller
                 name="serverIp"
                 control={control}
                 rules={{ required: 'Server IP is required' }}
                 render={({ field }) => (
-                  <Input {...field} placeholder="Enter server IP" />
+                  <Input {...field} placeholder="Enter server IP" className="bg-[#333333] border-[#2dd4bf] text-white" />
                 )}
               />
               {errors.serverIp && <p className="text-sm text-red-500">{errors.serverIp.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="serverPort">Server Port</Label>
+              <Label htmlFor="serverPort" className="text-[#2dd4bf]">Server Port</Label>
               <Controller
                 name="serverPort"
                 control={control}
                 rules={{ required: 'Server port is required' }}
                 render={({ field }) => (
-                  <Input {...field} placeholder="Enter server port" />
+                  <Input {...field} placeholder="Enter server port" className="bg-[#333333] border-[#2dd4bf] text-white" />
                 )}
               />
               {errors.serverPort && <p className="text-sm text-red-500">{errors.serverPort.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="messageInterval">Message Interval (minutes)</Label>
+              <Label htmlFor="messageInterval" className="text-[#2dd4bf]">Message Interval (minutes)</Label>
               <Controller
                 name="messageInterval"
                 control={control}
                 rules={{ required: 'Message interval is required', min: { value: 1, message: 'Minimum interval is 1 minute' } }}
                 render={({ field }) => (
-                  <Input {...field} type="number" placeholder="Enter message interval" />
+                  <Input {...field} type="number" placeholder="Enter message interval" className="bg-[#333333] border-[#2dd4bf] text-white" />
                 )}
               />
               {errors.messageInterval && <p className="text-sm text-red-500">{errors.messageInterval.message}</p>}
@@ -255,7 +254,7 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
       </CardContent>
       <CardFooter>
         <Button 
-          className="w-full" 
+          className="w-full bg-[#2dd4bf] text-[#212121] hover:bg-[#20a08d]" 
           onClick={handleSubmit(onSubmit)}
           disabled={isLoading}
         >
