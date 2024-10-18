@@ -55,8 +55,20 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   try {
     const client = await pool.connect();
     try {
-      await client.query('DELETE FROM server_configs WHERE id = $1', [id]);
+      await client.query('BEGIN');
+      await client.query('DELETE FROM player_history WHERE server_config_id = $1', [id]);
+      const result = await client.query('DELETE FROM server_configs WHERE id = $1', [id]);
+      await client.query('COMMIT');
+
+      if (result.rowCount === 0) {
+        return NextResponse.json({ error: 'Server configuration not found' }, { status: 404 });
+      }
+
       return NextResponse.json({ success: true });
+    } catch (error) {
+      // if we got an error, rollback the transaction
+      await client.query('ROLLBACK');
+      throw error;
     } finally {
       client.release();
     }

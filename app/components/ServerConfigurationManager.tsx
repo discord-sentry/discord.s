@@ -83,19 +83,25 @@ export default function ColorfulServersView() {
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`/api/server-config/${id}`, { method: 'DELETE' })
+      const response = await fetch(`/api/server-config/${id}`, { method: 'DELETE' });
       if (response.ok) {
-        setAlert({ type: 'success', message: "Server deleted successfully" })
-        clearAlert()
-        fetchServers()
+        const data = await response.json();
+        if (data.success) {
+          setAlert({ type: 'success', message: "Server deleted successfully" });
+          fetchServers();
+        } else {
+          throw new Error('Failed to delete server');
+        }
+      } else if (response.status === 404) {
+        setAlert({ type: 'error', message: "Server configuration not found" });
       } else {
-        throw new Error('Failed to delete server')
+        throw new Error('Failed to delete server');
       }
     } catch (error) {
-      console.error('Error deleting server:', error)
-      setAlert({ type: 'error', message: "Failed to delete server" })
-      clearAlert()
+      console.error('Error deleting server:', error);
+      setAlert({ type: 'error', message: "Failed to delete server" });
     }
+    clearAlert();
   }
 
   const handleEditSubmit = async (values: ServerConfig) => {

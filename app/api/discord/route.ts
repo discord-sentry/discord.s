@@ -7,7 +7,6 @@ const DISCORD_API_URL = 'https://discord.com/api/v10';
 let lastRequestTime = 0;
 const RATE_LIMIT_INTERVAL = 5000; // testing anything less than 5 seconds will cause rate limiting 
 
-// Define a type for the request body
 type DiscordRequestBody = {
   action: string;
   channelId?: string;

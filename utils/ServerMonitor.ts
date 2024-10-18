@@ -12,7 +12,7 @@ import { createCanvas } from 'canvas';
 dotenv.config({ path: '.env' });
 
 console.log('Attempting to create database pool');
-console.log('DB_URL:', process.env.DB_URL); // Add this line for debugging
+// console.log('DB_URL:', process.env.DB_URL); 
 
 const pool = new Pool({
   connectionString: process.env.DB_URL,
@@ -228,7 +228,6 @@ async function updateGameStatus() {
 
         console.log('GameDig query result:', state);
 
-        // Store the player count in the history
         await client.query(
           'INSERT INTO player_history (server_config_id, player_count) VALUES ($1, $2)',
           [row.id, state.players.length]
@@ -240,7 +239,6 @@ async function updateGameStatus() {
         );
         const history = historyResult.rows.reverse();
 
-        // Generate chart image
         const chartBuffer = await generateChartImage(history);
 
         const embed = {
@@ -301,7 +299,6 @@ async function updateGameStatus() {
           console.log(`Updated message_id for server config ${row.id}`);
         }
 
-        // Add a delay between server queries to avoid rate limiting
         await setTimeout(1000);
       } catch (error) {
         console.error(`Error querying game server ${row.server_ip}:${row.server_port}:`, error);
@@ -355,6 +352,5 @@ async function initializeUpdater() {
 
 export { initializeUpdater };
 
-// the bot wont have a online statys 
 
 
