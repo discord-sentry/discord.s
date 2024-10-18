@@ -60,6 +60,7 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     console.error('Database error:', error);
-    return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: 'Internal Server Error', details: errorMessage }, { status: 500 });
   }
 }
