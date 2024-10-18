@@ -21,8 +21,22 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install runtime dependencies along with Python and other build tools
-RUN apk add --no-cache python3 make g++ pkgconfig pixman-dev cairo-dev pango-dev jpeg-dev librsvg-dev
+# Install runtime dependencies along with Python, other build tools, and fonts
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    pkgconfig \
+    pixman-dev \
+    cairo-dev \
+    pango-dev \
+    jpeg-dev \
+    librsvg-dev \
+    fontconfig \
+    ttf-dejavu \
+    ttf-liberation \
+    ttf-freefont \
+    font-noto
 
 # Install production dependencies
 COPY package*.json ./
@@ -36,7 +50,6 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/utils ./utils 
-
 
 # Copy the .env file
 COPY .env .env
