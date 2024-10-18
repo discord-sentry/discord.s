@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { HomeIcon, SettingsIcon, ServerIcon } from 'lucide-react';
+import { HomeIcon, SettingsIcon, ServerIcon, Rss } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from 'next/navigation';
@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 const toolbarItems = [
   { name: 'Dashboard', path: '/dashboard', icon: HomeIcon },
   { name: 'Servers', path: '/dashboard/servers', icon: ServerIcon },
+  { name: 'Status', path: '/status', icon: Rss },
   { name: 'Settings', path: '/dashboard/settings', icon: SettingsIcon },
 ];
 

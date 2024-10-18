@@ -1,4 +1,4 @@
-// app/components/servers-view.tsx
+// app/components/ServerConfigurationManager.tsx
 
 'use client'
 
@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form"
+import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Pencil, Trash2, Loader2 } from "lucide-react"
 import Image from 'next/image'
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface GuildInfo {
   id: string
@@ -28,6 +29,8 @@ interface ServerConfig {
   server_ip: string
   server_port: number
   message_interval: number
+  show_graph: boolean
+  show_player_list: boolean
 }
 
 const gameTypeColors: { [key: string]: string } = {
@@ -37,7 +40,7 @@ const gameTypeColors: { [key: string]: string } = {
   'default': 'bg-[#2dd4bf] text-[#212121]'
 }
 
-export default function ColorfulServersView() {
+export default function ServerConfigurationManager() {
   const [servers, setServers] = useState<ServerConfig[]>([])
   const [loading, setLoading] = useState(true)
   const [editModalOpen, setEditModalOpen] = useState(false)
@@ -111,14 +114,22 @@ export default function ColorfulServersView() {
       const response = await fetch(`/api/server-config/${editingServer.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          ...values,
+          show_graph: values.show_graph,
+          show_player_list: values.show_player_list
+        }),
       })
 
       if (response.ok) {
+        const updatedServer = await response.json()
         setAlert({ type: 'success', message: "Server updated successfully" })
         clearAlert()
         setEditModalOpen(false)
-        fetchServers()
+        // Update the server in the local state
+        setServers(prevServers => prevServers.map(server => 
+          server.id === updatedServer.id ? { ...server, ...updatedServer } : server
+        ))
       } else {
         throw new Error('Failed to update server')
       }
@@ -151,13 +162,15 @@ export default function ColorfulServersView() {
               <TableHead className="text-[#2dd4bf]">Server IP</TableHead>
               <TableHead className="text-[#2dd4bf]">Server Port</TableHead>
               <TableHead className="text-[#2dd4bf]">Message Interval</TableHead>
+              <TableHead className="text-[#2dd4bf]">Show Graph</TableHead>
+              <TableHead className="text-[#2dd4bf]">Show Player List</TableHead>
               <TableHead className="text-[#2dd4bf]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center">
+                <TableCell colSpan={9} className="text-center">
                   <Loader2 className="h-6 w-6 animate-spin mx-auto text-[#2dd4bf]" />
                 </TableCell>
               </TableRow>
@@ -187,6 +200,12 @@ export default function ColorfulServersView() {
                   <TableCell className="text-gray-300">{server.server_ip}</TableCell>
                   <TableCell className="text-gray-300">{server.server_port}</TableCell>
                   <TableCell className="text-gray-300">{server.message_interval}</TableCell>
+                  <TableCell className="text-gray-300">
+                    <Checkbox checked={server.show_graph} disabled />
+                  </TableCell>
+                  <TableCell className="text-gray-300">
+                    <Checkbox checked={server.show_player_list} disabled />
+                  </TableCell>
                   <TableCell>
                     <Button variant="ghost" size="icon" onClick={() => handleEdit(server)} className="text-[#2dd4bf] hover:text-[#20a08d]">
                       <Pencil className="h-4 w-4" />
@@ -266,6 +285,50 @@ export default function ColorfulServersView() {
                     <FormControl>
                       <Input {...field} type="number" className="bg-[#333333] text-white border-[#2dd4bf]" />
                     </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="show_graph"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-[#2dd4bf]">
+                        Show Graph
+                      </FormLabel>
+                      <FormDescription>
+                        Display a graph of player count over time
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="show_player_list"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-[#2dd4bf]">
+                        Show Player List
+                      </FormLabel>
+                      <FormDescription>
+                        Display a list of current players
+                      </FormDescription>
+                    </div>
                   </FormItem>
                 )}
               />

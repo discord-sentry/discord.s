@@ -38,7 +38,9 @@ async function initializeDatabase() {
         server_ip TEXT NOT NULL,
         server_port INTEGER NOT NULL,
         message_id TEXT,
-        message_interval INTEGER NOT NULL DEFAULT 60
+        message_interval INTEGER NOT NULL DEFAULT 60,
+        show_graph BOOLEAN NOT NULL DEFAULT FALSE,
+        show_player_list BOOLEAN NOT NULL DEFAULT FALSE
       )
     `);
 
@@ -233,28 +235,31 @@ async function updateGameStatus() {
           [row.id, state.players.length]
         );
 
-        const historyResult = await client.query(
-          'SELECT timestamp, player_count FROM player_history WHERE server_config_id = $1 ORDER BY timestamp DESC LIMIT 24',
-          [row.id]
-        );
-        const history = historyResult.rows.reverse();
-
-        const chartBuffer = await generateChartImage(history);
-
-        const embed = {
+        const embed: any = {
           title: `🎮 ${state.name} Server Status`,
           fields: [
             { name: '👥 Players', value: `\`${state.players.length}/${state.maxplayers}\``, inline: true },
             { name: '🗺️ Map', value: `\`${state.map}\``, inline: true },
             { name: '🏷️ Game', value: `\`${getGameType(state)}\``, inline: true },
           ],
-          color: 0x7289DA, // Discord blurple color
+          color: 0x7289DA,
           timestamp: new Date().toISOString(),
-          image: { url: 'attachment://chart.png' },
           footer: { text: 'Player count updated every minute' }
         };
 
-        if (state.players.length > 0) {
+        let chartBuffer: Buffer | undefined;
+
+        if (row.show_graph) {
+          const historyResult = await client.query(
+            'SELECT timestamp, player_count FROM player_history WHERE server_config_id = $1 ORDER BY timestamp DESC LIMIT 24',
+            [row.id]
+          );
+          const history = historyResult.rows.reverse();
+          chartBuffer = await generateChartImage(history);
+          embed.image = { url: 'attachment://chart.png' };
+        }
+
+        if (row.show_player_list && state.players.length > 0) {
           const playerList = state.players
             .map((p: any) => p.name || 'Unknown')
             .sort((a: string, b: string) => a.localeCompare(b))
@@ -351,6 +356,3 @@ async function initializeUpdater() {
 }
 
 export { initializeUpdater };
-
-
-

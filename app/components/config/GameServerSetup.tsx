@@ -25,6 +25,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface ServerConfig {
   guildId: string
@@ -33,6 +34,8 @@ interface ServerConfig {
   serverIp: string
   serverPort: string
   messageInterval: number
+  showGraph: boolean
+  showPlayerList: boolean
 }
 
 interface ChannelData {
@@ -43,9 +46,9 @@ interface ChannelData {
 
 const gameTypes = [
   { value: 'minecraft', label: 'Minecraft' },
-  { value: 'csgo', label: 'Counter-Strike: Global Offensive' },
+  { value: 'projectzomboid', label: 'Project Zomboid' },
   { value: 'arma3', label: 'Arma 3' },
-  { value: 'valheim', label: 'Valheim' },
+  { value: 'dayz', label: 'DayZ' },
   { value: 'rust', label: 'Rust' },
   { value: 'terraria', label: 'Terraria' },
   { value: 'factorio', label: 'Factorio' },
@@ -84,35 +87,37 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
   }, [guildId])
 
   const onSubmit = async (data: ServerConfig) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch('/api/server-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
+          guildId,
           messageInterval: parseInt(data.messageInterval.toString(), 10) || 60
         }),
-      })
+      });
 
       if (response.ok) {
         setAlert({
           type: 'success',
           message: "Your server configuration has been saved successfully."
-        })
+        });
       } else {
-        throw new Error('Failed to save configuration')
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save configuration');
       }
-    } catch (error) {
-      console.error('Error saving configuration:', error)
+    } catch (error: unknown) {
+      console.error('Error saving configuration:', error);
       setAlert({
         type: 'error',
-        message: "Failed to save server configuration. Please try again."
-      })
+        message: error instanceof Error ? error.message : "Failed to save server configuration. Please try again."
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Card className="w-full max-w-4xl mx-auto bg-[#2a2a2a] text-white border-[#2dd4bf]">
@@ -248,6 +253,50 @@ export default function ServerConfigForm({ guildId }: { guildId: string }) {
                 )}
               />
               {errors.messageInterval && <p className="text-sm text-red-500">{errors.messageInterval.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[#2dd4bf]">Display Options</Label>
+              <div className="flex space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Controller
+                    name="showGraph"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        id="showGraph"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <label
+                    htmlFor="showGraph"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Show Graph
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Controller
+                    name="showPlayerList"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        id="showPlayerList"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <label
+                    htmlFor="showPlayerList"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Show Player List
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
         </form>

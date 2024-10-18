@@ -28,18 +28,24 @@ export async function GET(request: Request, { params }: { params: { id: string }
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   const id = params.id;
   const body = await request.json();
-  const { channel_id, game_type, server_ip, server_port, message_interval } = body;
+  const { channel_id, game_type, server_ip, server_port, message_interval, show_graph, show_player_list } = body;
 
   try {
     const client = await pool.connect();
     try {
-      await client.query(
+      const result = await client.query(
         `UPDATE server_configs 
-        SET channel_id = $1, game_type = $2, server_ip = $3, server_port = $4, message_interval = $5
-        WHERE id = $6`,
-        [channel_id, game_type, server_ip, server_port, message_interval, id]
+        SET channel_id = $1, game_type = $2, server_ip = $3, server_port = $4, message_interval = $5, show_graph = $6, show_player_list = $7
+        WHERE id = $8
+        RETURNING *`,
+        [channel_id, game_type, server_ip, server_port, message_interval, show_graph, show_player_list, id]
       );
-      return NextResponse.json({ success: true });
+
+      if (result.rows.length === 0) {
+        return NextResponse.json({ error: 'Server configuration not found' }, { status: 404 });
+      }
+
+      return NextResponse.json(result.rows[0]);
     } finally {
       client.release();
     }
