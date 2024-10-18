@@ -22,7 +22,7 @@ interface Release {
 
 type MarkdownComponentProps = {
   children: ReactNode
-  [key: string]: any // For any additional props
+  [key: string]: any 
 }
 
 const MarkdownComponents: Record<string, React.FC<MarkdownComponentProps>> = {

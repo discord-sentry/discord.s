@@ -1,5 +1,7 @@
 // app/utils/ServerMonitor.ts
 
+// code by - wadedesign - do not remove this line
+
 import { GameDig } from 'gamedig';
 import { Pool } from 'pg';
 import nodeFetch from 'node-fetch';
@@ -12,7 +14,6 @@ import { createCanvas } from 'canvas';
 dotenv.config({ path: '.env' });
 
 console.log('Attempting to create database pool');
-// console.log('DB_URL:', process.env.DB_URL); 
 
 const pool = new Pool({
   connectionString: process.env.DB_URL,

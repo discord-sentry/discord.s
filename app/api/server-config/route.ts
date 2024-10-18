@@ -24,7 +24,6 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { guildId, channelId, gameType, serverIp, serverPort, messageInterval, showGraph, showPlayerList } = body;
 
-  // Add validation for guildId
   if (!guildId) {
     return NextResponse.json({ error: 'Guild ID is required' }, { status: 400 });
   }
@@ -45,7 +44,6 @@ export async function POST(request: Request) {
           [channelId, gameType, messageInterval || 60, showGraph, showPlayerList, existingConfig.rows[0].id]
         );
       } else {
-        // Insert the new configuration
         await client.query(
           `INSERT INTO server_configs 
           (guild_id, channel_id, game_type, server_ip, server_port, message_interval, show_graph, show_player_list) 
