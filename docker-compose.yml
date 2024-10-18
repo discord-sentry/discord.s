@@ -7,6 +7,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4596:4596"
+    env_file:
+      - .env.local
     volumes:
       - .:/app
-    command: npx concurrently "npm:start" "npm:start-updater"
+    command: ["npx", "concurrently", "npm:start", "node", "scripts/run-updater.js"]
+
+networks:
+  default:
+    driver: bridge
