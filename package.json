@@ -2,13 +2,12 @@
   "name": "game.discord",
   "version": "0.1.0",
   "private": true,
-  "type": "commonjs",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p 4596",
     "lint": "next lint",
-    "start-updater": "ts-node -r dotenv/config scripts/run-updater.ts dotenv_config_path=.env.local"
+    "start-updater": "tsx scripts/run-updater.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

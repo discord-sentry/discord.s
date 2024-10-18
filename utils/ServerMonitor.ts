@@ -1,4 +1,4 @@
-// app/utils/game-status-updater.ts
+// app/utils/ServerMonitor.ts
 
 import { GameDig } from 'gamedig';
 import { Pool } from 'pg';
@@ -7,6 +7,8 @@ import FormDataNode from 'form-data';
 import { setTimeout } from 'timers/promises';
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
 import { ChartConfiguration, ChartData, ChartOptions } from 'chart.js';
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
 
 console.log('Attempting to create database pool');
 const pool = new Pool({

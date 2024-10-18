@@ -1,4 +1,4 @@
-# Stage 1: Build the Next.js app
+# Stage 1: Build the Next.js app and compile TypeScript
 FROM node:18-alpine AS builder
 
 WORKDIR /app
@@ -13,8 +13,9 @@ RUN npm ci --silent
 # Copy the rest of the app's source code
 COPY . .
 
-# Build the Next.js app
+# Build the Next.js app and TypeScript files
 RUN npm run build
+RUN npm run build-updater
 
 # Stage 2: Run the app and updater
 FROM node:18-alpine
@@ -28,9 +29,6 @@ RUN apk add --no-cache python3 make g++ pkgconfig pixman-dev cairo-dev pango-dev
 COPY package*.json ./
 RUN npm ci --only=production
 
-# Install TypeScript, ts-node, and concurrently for the updater script
-RUN npm install typescript ts-node concurrently --silent
-
 # Copy built assets from the builder stage
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
@@ -39,5 +37,5 @@ COPY --from=builder /app/scripts ./scripts
 # Expose the port the app runs on
 EXPOSE 4596
 
-# Start both the Next.js app and the updater script using concurrently
-CMD ["npx", "concurrently", "npm:start", "npm:start-updater"]
+# Start both the Next.js app and the precompiled updater script using concurrently
+CMD ["npx", "concurrently", "npm:start", "node", "scripts/run-updater.js"]
