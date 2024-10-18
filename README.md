@@ -67,17 +67,9 @@ Don't just monitor your servers, guard them with discord.sentry.
 3. Configure game servers using the provided form
 4. The bot will automatically start monitoring configured servers and posting updates to the specified Discord channels
 
-## 📁 Project Structure
 
-- `/app`: Next.js application files
-  - `/api`: API routes for server-side operations
-  - `/components`: React components
-  - `/dashboard`: Dashboard pages
-  - `/utils`: Utility functions and server monitor
-- `/scripts`: Scripts for running the updater
-- `/public`: Static assets
 
-## 🤝 Contributing d
+## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
