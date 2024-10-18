@@ -25,9 +25,9 @@ WORKDIR /app
 # Install runtime dependencies along with Python and other build tools
 RUN apk add --no-cache python3 make g++ pkgconfig pixman-dev cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
 
-# Install production dependencies
+# Install production dependencies, including tsx
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --only=production && npm install tsx --global
 
 # Copy built assets from the builder stage
 COPY --from=builder /app/.next ./.next
