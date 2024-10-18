@@ -119,83 +119,39 @@ async function generateChartImage(history: any[]) {
   const ctx = canvas.getContext('2d');
 
   // Set background
-  ctx.fillStyle = '#f0f0f0';
+  ctx.fillStyle = '#2f3136';  // Discord dark theme background color
   ctx.fillRect(0, 0, width, height);
 
   // Prepare data
-  const labels = history.map(h => new Date(h.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
   const data = history.map(h => h.player_count);
   const maxCount = Math.max(...data, 10);
+  const minCount = Math.min(...data, 0);
 
   // Chart area
+  const padding = 40;
   const chartArea = {
-    left: 80,
-    right: width - 40,
-    top: 60,
-    bottom: height - 80,
+    left: padding,
+    right: width - padding,
+    top: padding,
+    bottom: height - padding,
   };
 
-  // Draw title
-  ctx.fillStyle = '#333333';
-  ctx.font = 'bold 24px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText('Player Count Over Time', width / 2, 30);
-
-  // Draw Y-axis
+  // Draw axes
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(chartArea.left, chartArea.top);
   ctx.lineTo(chartArea.left, chartArea.bottom);
-  ctx.strokeStyle = '#999999';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Draw Y-axis labels and grid lines
-  ctx.fillStyle = '#333333';
-  ctx.font = '14px Arial';
-  ctx.textAlign = 'right';
-  const yStep = Math.ceil(maxCount / 5);
-  for (let i = 0; i <= maxCount; i += yStep) {
-    const y = chartArea.bottom - ((chartArea.bottom - chartArea.top) * i / maxCount);
-    ctx.fillText(i.toString(), chartArea.left - 10, y + 5);
-    
-    // Draw horizontal grid line
-    ctx.beginPath();
-    ctx.moveTo(chartArea.left, y);
-    ctx.lineTo(chartArea.right, y);
-    ctx.strokeStyle = '#dddddd';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-  }
-
-  // Draw X-axis
-  ctx.beginPath();
-  ctx.moveTo(chartArea.left, chartArea.bottom);
   ctx.lineTo(chartArea.right, chartArea.bottom);
-  ctx.strokeStyle = '#999999';
-  ctx.lineWidth = 2;
   ctx.stroke();
-
-  // Draw X-axis labels
-  ctx.fillStyle = '#333333';
-  ctx.font = '12px Arial';
-  ctx.textAlign = 'center';
-  const xStep = (chartArea.right - chartArea.left) / (labels.length - 1);
-  labels.forEach((label, i) => {
-    const x = chartArea.left + i * xStep;
-    ctx.save();
-    ctx.translate(x, chartArea.bottom + 10);
-    ctx.rotate(-Math.PI / 4);
-    ctx.fillText(label, 0, 0);
-    ctx.restore();
-  });
 
   // Draw data points and lines
-  ctx.beginPath();
-  ctx.strokeStyle = '#1e88e5';
+  ctx.strokeStyle = '#7289da';  // Discord blurple color
   ctx.lineWidth = 3;
+  ctx.beginPath();
   data.forEach((count, i) => {
-    const x = chartArea.left + i * xStep;
-    const y = chartArea.bottom - ((chartArea.bottom - chartArea.top) * count / maxCount);
+    const x = chartArea.left + (i / (data.length - 1)) * (chartArea.right - chartArea.left);
+    const y = chartArea.bottom - ((count - minCount) / (maxCount - minCount)) * (chartArea.bottom - chartArea.top);
     if (i === 0) {
       ctx.moveTo(x, y);
     } else {
@@ -205,33 +161,32 @@ async function generateChartImage(history: any[]) {
   ctx.stroke();
 
   // Draw data points
+  ctx.fillStyle = '#ffffff';
   data.forEach((count, i) => {
-    const x = chartArea.left + i * xStep;
-    const y = chartArea.bottom - ((chartArea.bottom - chartArea.top) * count / maxCount);
+    const x = chartArea.left + (i / (data.length - 1)) * (chartArea.right - chartArea.left);
+    const y = chartArea.bottom - ((count - minCount) / (maxCount - minCount)) * (chartArea.bottom - chartArea.top);
     ctx.beginPath();
-    ctx.arc(x, y, 6, 0, Math.PI * 2);
-    ctx.fillStyle = '#1e88e5';
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
   });
 
-  // Draw Y-axis title
-  ctx.save();
-  ctx.translate(20, height / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.fillStyle = '#333333';
-  ctx.font = 'bold 16px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText('Player Count', 0, 0);
-  ctx.restore();
+  // Draw Y-axis labels
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '14px Arial';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i <= 5; i++) {
+    const y = chartArea.bottom - (i / 5) * (chartArea.bottom - chartArea.top);
+    const value = Math.round(minCount + (i / 5) * (maxCount - minCount));
+    ctx.fillText(value.toString(), chartArea.left - 10, y);
+  }
 
-  // Draw X-axis title
-  ctx.fillStyle = '#333333';
-  ctx.font = 'bold 16px Arial';
+  // Draw title
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 18px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText('Time', width / 2, height - 10);
+  ctx.textBaseline = 'top';
+  ctx.fillText('Player Count Over Time', width / 2, 10);
 
   return canvas.toBuffer('image/png');
 }
@@ -277,7 +232,7 @@ async function updateGameStatus() {
             { name: '🗺️ Map', value: `\`${state.map}\``, inline: true },
             { name: '🏷️ Game', value: `\`${getGameType(state)}\``, inline: true },
           ],
-          color: 0x2F3136, // Dark embed color
+          color: 0x7289DA, // Discord blurple color
           timestamp: new Date().toISOString(),
           image: { url: 'attachment://chart.png' }
         };
