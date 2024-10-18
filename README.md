@@ -73,7 +73,7 @@ Don't just monitor your servers, guard them with discord.sentry.
 - `/scripts`: Scripts for running the updater
 - `/public`: Static assets
 
-## 🤝 Contributing
+## 🤝 Contributing d
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
