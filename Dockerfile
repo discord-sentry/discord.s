@@ -15,7 +15,7 @@ COPY . .
 
 # Build the Next.js app and TypeScript files
 RUN npm run build
-RUN npm run build-updater
+RUN npm run start-updater
 
 # Stage 2: Run the app and updater
 FROM node:18-alpine
