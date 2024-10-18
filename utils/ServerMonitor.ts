@@ -11,6 +11,8 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '.env' });
 
 console.log('Attempting to create database pool');
+console.log('DB_URL:', process.env.DB_URL); // Add this line for debugging
+
 const pool = new Pool({
   connectionString: process.env.DB_URL,
 });
