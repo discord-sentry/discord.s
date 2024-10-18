@@ -113,48 +113,77 @@ async function sendOrUpdateDiscordMessage(channelId: string, embed: any, message
 }
 
 async function generateChartImage(history: any[]) {
-  const width = 600;
-  const height = 300;
+  const width = 800;
+  const height = 400;
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
 
   // Set background
-  ctx.fillStyle = 'white';
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, width, height);
-
-  // Draw title
-  ctx.fillStyle = '#333';
-  ctx.font = 'bold 18px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText('Player Count Over Time', width / 2, 30);
 
   // Prepare data
   const labels = history.map(h => new Date(h.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
   const data = history.map(h => h.player_count);
   const maxCount = Math.max(...data, 10);
 
-  // Draw axes
+  // Chart area
+  const chartArea = {
+    left: 60,
+    right: width - 30,
+    top: 50,
+    bottom: height - 60,
+  };
+
+  // Draw title
+  ctx.fillStyle = '#333333';
+  ctx.font = 'bold 20px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Player Count Over Time', width / 2, 30);
+
+  // Draw Y-axis
   ctx.beginPath();
-  ctx.moveTo(50, 50);
-  ctx.lineTo(50, height - 50);
-  ctx.lineTo(width - 50, height - 50);
+  ctx.moveTo(chartArea.left, chartArea.top);
+  ctx.lineTo(chartArea.left, chartArea.bottom);
+  ctx.strokeStyle = '#cccccc';
   ctx.stroke();
 
-  // Draw Y-axis labels
-  ctx.fillStyle = '#666';
+  // Draw Y-axis labels and grid lines
+  ctx.fillStyle = '#666666';
   ctx.font = '12px Arial';
   ctx.textAlign = 'right';
-  for (let i = 0; i <= maxCount; i += Math.ceil(maxCount / 5)) {
-    const y = height - 50 - ((height - 100) * i / maxCount);
-    ctx.fillText(i.toString(), 45, y);
+  const yStep = Math.ceil(maxCount / 5);
+  for (let i = 0; i <= maxCount; i += yStep) {
+    const y = chartArea.bottom - ((chartArea.bottom - chartArea.top) * i / maxCount);
+    ctx.fillText(i.toString(), chartArea.left - 10, y + 4);
+    
+    // Draw horizontal grid line
+    ctx.beginPath();
+    ctx.moveTo(chartArea.left, y);
+    ctx.lineTo(chartArea.right, y);
+    ctx.strokeStyle = '#eeeeee';
+    ctx.stroke();
   }
 
+  // Draw X-axis
+  ctx.beginPath();
+  ctx.moveTo(chartArea.left, chartArea.bottom);
+  ctx.lineTo(chartArea.right, chartArea.bottom);
+  ctx.strokeStyle = '#cccccc';
+  ctx.stroke();
+
   // Draw X-axis labels
+  ctx.fillStyle = '#666666';
+  ctx.font = '12px Arial';
   ctx.textAlign = 'center';
-  const xStep = (width - 100) / (labels.length - 1);
+  const xStep = (chartArea.right - chartArea.left) / (labels.length - 1);
   labels.forEach((label, i) => {
-    const x = 50 + i * xStep;
-    ctx.fillText(label, x, height - 30);
+    const x = chartArea.left + i * xStep;
+    ctx.save();
+    ctx.translate(x, chartArea.bottom + 10);
+    ctx.rotate(-Math.PI / 4);
+    ctx.fillText(label, 0, 0);
+    ctx.restore();
   });
 
   // Draw data points and lines
@@ -162,16 +191,28 @@ async function generateChartImage(history: any[]) {
   ctx.strokeStyle = 'rgb(75, 192, 192)';
   ctx.lineWidth = 2;
   data.forEach((count, i) => {
-    const x = 50 + i * xStep;
-    const y = height - 50 - ((height - 100) * count / maxCount);
+    const x = chartArea.left + i * xStep;
+    const y = chartArea.bottom - ((chartArea.bottom - chartArea.top) * count / maxCount);
     if (i === 0) {
       ctx.moveTo(x, y);
     } else {
       ctx.lineTo(x, y);
     }
-    ctx.arc(x, y, 3, 0, Math.PI * 2);
   });
   ctx.stroke();
+
+  // Draw data points
+  data.forEach((count, i) => {
+    const x = chartArea.left + i * xStep;
+    const y = chartArea.bottom - ((chartArea.bottom - chartArea.top) * count / maxCount);
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgb(75, 192, 192)';
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
 
   return canvas.toBuffer('image/png');
 }
