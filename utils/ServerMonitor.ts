@@ -8,8 +8,7 @@ import { setTimeout } from 'timers/promises';
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
 import { ChartConfiguration, ChartData, ChartOptions } from 'chart.js';
 import dotenv from 'dotenv';
-import { Chart, registerables } from 'chart.js';
-Chart.register(...registerables);
+import { createCanvas } from 'canvas';
 dotenv.config({ path: '.env' });
 
 console.log('Attempting to create database pool');
@@ -114,95 +113,67 @@ async function sendOrUpdateDiscordMessage(channelId: string, embed: any, message
 }
 
 async function generateChartImage(history: any[]) {
-  const width = 600; // Increased width for better readability
-  const height = 300; // Increased height
-  const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour: 'white' });
+  const width = 600;
+  const height = 300;
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
 
+  // Set background
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, width, height);
+
+  // Draw title
+  ctx.fillStyle = '#333';
+  ctx.font = 'bold 18px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Player Count Over Time', width / 2, 30);
+
+  // Prepare data
   const labels = history.map(h => new Date(h.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
   const data = history.map(h => h.player_count);
+  const maxCount = Math.max(...data, 10);
 
-  const chartData: ChartData = {
-    labels: labels,
-    datasets: [{
-      label: 'Players',
-      data: data,
-      fill: false,
-      borderColor: 'rgb(75, 192, 192)',
-      tension: 0.1,
-      pointRadius: 3,
-      pointHoverRadius: 5,
-    }]
-  };
+  // Draw axes
+  ctx.beginPath();
+  ctx.moveTo(50, 50);
+  ctx.lineTo(50, height - 50);
+  ctx.lineTo(width - 50, height - 50);
+  ctx.stroke();
 
-  const chartOptions: ChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: 'Player Count',
-          font: {
-            size: 14,
-            weight: 'bold',
-          },
-          color: '#333',
-        },
-        ticks: {
-          font: {
-            size: 12,
-          },
-          color: '#666',
-        },
-      },
-      x: {
-        title: {
-          display: true,
-          text: 'Time',
-          font: {
-            size: 14,
-            weight: 'bold',
-          },
-          color: '#333',
-        },
-        ticks: {
-          font: {
-            size: 10,
-          },
-          color: '#666',
-          maxRotation: 45,
-          minRotation: 45,
-        },
-      },
-    },
-    plugins: {
-      title: {
-        display: true,
-        text: 'Player Count Over Time',
-        font: {
-          size: 18,
-          weight: 'bold',
-        },
-        color: '#333',
-        padding: {
-          top: 10,
-          bottom: 30,
-        },
-      },
-      legend: {
-        display: false,
-      },
-    },
-  };
+  // Draw Y-axis labels
+  ctx.fillStyle = '#666';
+  ctx.font = '12px Arial';
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= maxCount; i += Math.ceil(maxCount / 5)) {
+    const y = height - 50 - ((height - 100) * i / maxCount);
+    ctx.fillText(i.toString(), 45, y);
+  }
 
-  const configuration: ChartConfiguration = {
-    type: 'line',
-    data: chartData,
-    options: chartOptions,
-  };
+  // Draw X-axis labels
+  ctx.textAlign = 'center';
+  const xStep = (width - 100) / (labels.length - 1);
+  labels.forEach((label, i) => {
+    const x = 50 + i * xStep;
+    ctx.fillText(label, x, height - 30);
+  });
 
-  return await chartJSNodeCanvas.renderToBuffer(configuration);
+  // Draw data points and lines
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgb(75, 192, 192)';
+  ctx.lineWidth = 2;
+  data.forEach((count, i) => {
+    const x = 50 + i * xStep;
+    const y = height - 50 - ((height - 100) * count / maxCount);
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+  });
+  ctx.stroke();
+
+  return canvas.toBuffer('image/png');
 }
 
 async function updateGameStatus() {
