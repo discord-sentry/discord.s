@@ -35,6 +35,8 @@ RUN npm install -g tsx
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/scripts ./scripts
+COPY --from=builder /app/utils ./utils 
+
 
 # Copy the .env file
 COPY .env .env
