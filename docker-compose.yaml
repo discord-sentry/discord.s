@@ -11,7 +11,7 @@ services:
       - .env
     volumes:
       - .:/app
-    command: ["npx", "concurrently", "npm:start", "node", "scripts/run-updater.js"]
+    command: ["npx", "concurrently", "npm:start", "node", "scripts/run-updater.ts"]
 
 networks:
   default:
