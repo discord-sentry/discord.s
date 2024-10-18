@@ -15,7 +15,6 @@ COPY . .
 
 # Build the Next.js app and TypeScript files
 RUN npm run build
-RUN npm run start-updater
 
 # Stage 2: Run the app and updater
 FROM node:18-alpine
@@ -40,8 +39,5 @@ COPY .env .env
 # Expose the port the app runs on
 EXPOSE 4596
 
-# Start both the Next.js app and the precompiled updater script using concurrently
-CMD ["npx", "concurrently", "npm:start", "node", "scripts/run-updater.js"]
-
-# docker build -t game.discord .
-# docker run -d -p 4596:4596 game.discord
+# Start the Next.js app, then delay running the updater script
+CMD ["sh", "-c", "npm:start & sleep 5 && node scripts/run-updater.ts"]
