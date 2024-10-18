@@ -28,8 +28,8 @@ RUN apk add --no-cache python3 make g++ pkgconfig pixman-dev cairo-dev pango-dev
 COPY package*.json ./
 RUN npm install --silent
 
-# Install global packages: chalk and tsx
-RUN npm install -g chalk tsx
+# Install global package: tsx (removed chalk)
+RUN npm install -g tsx
 
 # Copy built assets from the builder stage
 COPY --from=builder /app/.next ./.next
