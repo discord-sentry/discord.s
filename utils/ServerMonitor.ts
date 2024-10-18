@@ -128,10 +128,10 @@ async function generateChartImage(history: any[]) {
   const minCount = Math.min(...data, 0);
 
   // Chart area
-  const padding = 40;
+  const padding = 60;
   const chartArea = {
     left: padding,
-    right: width - padding,
+    right: width - padding / 2,
     top: padding,
     bottom: height - padding,
   };
@@ -147,7 +147,7 @@ async function generateChartImage(history: any[]) {
 
   // Draw data points and lines
   ctx.strokeStyle = '#7289da';  // Discord blurple color
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 4;
   ctx.beginPath();
   data.forEach((count, i) => {
     const x = chartArea.left + (i / (data.length - 1)) * (chartArea.right - chartArea.left);
@@ -166,13 +166,16 @@ async function generateChartImage(history: any[]) {
     const x = chartArea.left + (i / (data.length - 1)) * (chartArea.right - chartArea.left);
     const y = chartArea.bottom - ((count - minCount) / (maxCount - minCount)) * (chartArea.bottom - chartArea.top);
     ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.arc(x, y, 6, 0, Math.PI * 2);
     ctx.fill();
+    ctx.strokeStyle = '#7289da';
+    ctx.lineWidth = 2;
+    ctx.stroke();
   });
 
   // Draw Y-axis labels
   ctx.fillStyle = '#ffffff';
-  ctx.font = '14px Arial';
+  ctx.font = 'bold 16px Arial';
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
   for (let i = 0; i <= 5; i++) {
@@ -183,10 +186,16 @@ async function generateChartImage(history: any[]) {
 
   // Draw title
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 18px Arial';
+  ctx.font = 'bold 24px Arial';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  ctx.fillText('Player Count Over Time', width / 2, 10);
+  ctx.fillText('Player Count Over Time', width / 2, 20);
+
+  // Draw current player count
+  const currentCount = data[data.length - 1];
+  ctx.font = 'bold 20px Arial';
+  ctx.textAlign = 'right';
+  ctx.fillText(`Current: ${currentCount}`, chartArea.right, chartArea.top - 10);
 
   return canvas.toBuffer('image/png');
 }
@@ -234,7 +243,8 @@ async function updateGameStatus() {
           ],
           color: 0x7289DA, // Discord blurple color
           timestamp: new Date().toISOString(),
-          image: { url: 'attachment://chart.png' }
+          image: { url: 'attachment://chart.png' },
+          footer: { text: 'Player count updated every minute' }
         };
 
         if (state.players.length > 0) {
@@ -337,3 +347,5 @@ async function initializeUpdater() {
 export { initializeUpdater };
 
 // the bot wont have a online statys 
+
+
