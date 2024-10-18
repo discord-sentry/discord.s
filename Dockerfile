@@ -4,7 +4,7 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # Install Python and build dependencies required for node-gyp
-RUN apk add --no-cache python3 make g++ pkgconfig pixman-dev cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+RUN apk add --no-cache python3 make g++ pkgconfig pixman-dev cairo-dev pango-dev jpeg-dev librsvg-dev
 
 # Install dependencies
 COPY package*.json ./
@@ -16,18 +16,20 @@ COPY . .
 # Build the Next.js app and TypeScript files
 RUN npm run build
 
-
 # Stage 2: Run the app and updater
 FROM node:18-alpine
 
 WORKDIR /app
 
 # Install runtime dependencies along with Python and other build tools
-RUN apk add --no-cache python3 make g++ pkgconfig pixman-dev cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+RUN apk add --no-cache python3 make g++ pkgconfig pixman-dev cairo-dev pango-dev jpeg-dev librsvg-dev
 
-# Install production dependencies, ensuring chalk is installed
+# Install production dependencies
 COPY package*.json ./
-RUN npm ci --production && npm install chalk tsx --global
+RUN npm install --silent
+
+# Install global packages: chalk and tsx
+RUN npm install -g chalk tsx
 
 # Copy built assets from the builder stage
 COPY --from=builder /app/.next ./.next
