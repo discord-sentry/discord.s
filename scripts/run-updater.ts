@@ -1,8 +1,9 @@
 // scripts/run-updater.ts
 
-import dotenv from 'dotenv';
-import chalk from 'chalk';
-import { initializeUpdater } from '../utils/ServerMonitor';
+const dotenv = require('dotenv');
+const chalk = require('chalk');
+const { initializeUpdater } = require('../utils/ServerMonitor');
+
 
 
 dotenv.config({ path: '.env' });
