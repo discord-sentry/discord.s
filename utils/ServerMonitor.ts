@@ -119,7 +119,7 @@ async function generateChartImage(history: any[]) {
   const ctx = canvas.getContext('2d');
 
   // Set background
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = '#f0f0f0';
   ctx.fillRect(0, 0, width, height);
 
   // Prepare data
@@ -129,15 +129,15 @@ async function generateChartImage(history: any[]) {
 
   // Chart area
   const chartArea = {
-    left: 60,
-    right: width - 30,
-    top: 50,
-    bottom: height - 60,
+    left: 80,
+    right: width - 40,
+    top: 60,
+    bottom: height - 80,
   };
 
   // Draw title
   ctx.fillStyle = '#333333';
-  ctx.font = 'bold 20px Arial';
+  ctx.font = 'bold 24px Arial';
   ctx.textAlign = 'center';
   ctx.fillText('Player Count Over Time', width / 2, 30);
 
@@ -145,23 +145,25 @@ async function generateChartImage(history: any[]) {
   ctx.beginPath();
   ctx.moveTo(chartArea.left, chartArea.top);
   ctx.lineTo(chartArea.left, chartArea.bottom);
-  ctx.strokeStyle = '#cccccc';
+  ctx.strokeStyle = '#999999';
+  ctx.lineWidth = 2;
   ctx.stroke();
 
   // Draw Y-axis labels and grid lines
-  ctx.fillStyle = '#666666';
-  ctx.font = '12px Arial';
+  ctx.fillStyle = '#333333';
+  ctx.font = '14px Arial';
   ctx.textAlign = 'right';
   const yStep = Math.ceil(maxCount / 5);
   for (let i = 0; i <= maxCount; i += yStep) {
     const y = chartArea.bottom - ((chartArea.bottom - chartArea.top) * i / maxCount);
-    ctx.fillText(i.toString(), chartArea.left - 10, y + 4);
+    ctx.fillText(i.toString(), chartArea.left - 10, y + 5);
     
     // Draw horizontal grid line
     ctx.beginPath();
     ctx.moveTo(chartArea.left, y);
     ctx.lineTo(chartArea.right, y);
-    ctx.strokeStyle = '#eeeeee';
+    ctx.strokeStyle = '#dddddd';
+    ctx.lineWidth = 1;
     ctx.stroke();
   }
 
@@ -169,11 +171,12 @@ async function generateChartImage(history: any[]) {
   ctx.beginPath();
   ctx.moveTo(chartArea.left, chartArea.bottom);
   ctx.lineTo(chartArea.right, chartArea.bottom);
-  ctx.strokeStyle = '#cccccc';
+  ctx.strokeStyle = '#999999';
+  ctx.lineWidth = 2;
   ctx.stroke();
 
   // Draw X-axis labels
-  ctx.fillStyle = '#666666';
+  ctx.fillStyle = '#333333';
   ctx.font = '12px Arial';
   ctx.textAlign = 'center';
   const xStep = (chartArea.right - chartArea.left) / (labels.length - 1);
@@ -188,8 +191,8 @@ async function generateChartImage(history: any[]) {
 
   // Draw data points and lines
   ctx.beginPath();
-  ctx.strokeStyle = 'rgb(75, 192, 192)';
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#1e88e5';
+  ctx.lineWidth = 3;
   data.forEach((count, i) => {
     const x = chartArea.left + i * xStep;
     const y = chartArea.bottom - ((chartArea.bottom - chartArea.top) * count / maxCount);
@@ -206,13 +209,29 @@ async function generateChartImage(history: any[]) {
     const x = chartArea.left + i * xStep;
     const y = chartArea.bottom - ((chartArea.bottom - chartArea.top) * count / maxCount);
     ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgb(75, 192, 192)';
+    ctx.arc(x, y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = '#1e88e5';
     ctx.fill();
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 2;
     ctx.stroke();
   });
+
+  // Draw Y-axis title
+  ctx.save();
+  ctx.translate(20, height / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = '#333333';
+  ctx.font = 'bold 16px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Player Count', 0, 0);
+  ctx.restore();
+
+  // Draw X-axis title
+  ctx.fillStyle = '#333333';
+  ctx.font = 'bold 16px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Time', width / 2, height - 10);
 
   return canvas.toBuffer('image/png');
 }
@@ -363,4 +382,3 @@ async function initializeUpdater() {
 export { initializeUpdater };
 
 // the bot wont have a online statys 
-
