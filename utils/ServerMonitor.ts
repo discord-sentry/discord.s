@@ -8,7 +8,7 @@ import { setTimeout } from 'timers/promises';
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
 import { ChartConfiguration, ChartData, ChartOptions } from 'chart.js';
 import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env' });
 
 console.log('Attempting to create database pool');
 const pool = new Pool({

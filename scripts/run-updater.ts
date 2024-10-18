@@ -4,7 +4,8 @@ import dotenv from 'dotenv';
 import chalk from 'chalk';
 import { initializeUpdater } from '../utils/ServerMonitor';
 
-dotenv.config({ path: '.env.local' });
+
+dotenv.config({ path: '.env' });
 
 console.log(chalk.bold.green('🎮 Game status updater script started 🚀'));
 
